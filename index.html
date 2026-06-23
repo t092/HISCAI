@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>國中歷史 CAI 互動學習平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1565c0;
+  --primary-light: #e3f2fd;
+  --primary-dark: #0d47a1;
+  --accent: #f59e0b;
+  --accent-dark: #e65100;
+  --accent-light: #fff8e1;
+  --ink: #1e293b;
+  --ink-sub: #475569;
+  --muted: #94a3b8;
+  --line: #e2e8f0;
+  --card-bg: #ffffff;
+  --bg-1: #f0f5ff;
+  --bg-2: #fdfbf7;
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.12);
+  --radius: 16px;
+  --radius-sm: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Noto Sans TC", "Outfit", sans-serif;
+  background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%);
+  min-height: 100vh;
+  color: var(--ink);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+.container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+/* ====== Hero ====== */
+.hero {
+  position: relative;
+  padding: 80px 0 60px;
+  text-align: center;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.hero-bg::before,
+.hero-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+}
+.hero-bg::before {
+  width: 480px; height: 480px;
+  background: radial-gradient(circle, #93c5fd 0%, transparent 70%);
+  top: -120px; left: -100px;
+}
+.hero-bg::after {
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, #fcd34d 0%, transparent 70%);
+  bottom: -160px; right: -80px;
+  opacity: 0.35;
+}
+
+.hero-crest {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 22px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(21, 101, 192, 0.15);
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  letter-spacing: 2px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 28px;
+}
+.hero-crest .dot {
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.hero h1 {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(40px, 6vw, 64px);
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  margin-bottom: 18px;
+}
+.hero h1 .accent {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent-dark) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.hero .tagline {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(16px, 2vw, 20px);
+  color: var(--ink-sub);
+  max-width: 640px;
+  margin: 0 auto 36px;
+}
+
+.hero-cta {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(21, 101, 192, 0.3);
+  transition: var(--transition);
+  font-family: inherit;
+}
+.hero-cta:hover {
+  background: var(--primary-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(21, 101, 192, 0.4);
+}
+
+.hero-stats {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin-top: 48px;
+  flex-wrap: wrap;
+}
+.hero-stat {
+  text-align: center;
+}
+.hero-stat .num {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--primary-dark);
+  line-height: 1;
+}
+.hero-stat .label {
+  font-size: 13px;
+  color: var(--ink-sub);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+/* ====== Section heading ====== */
+.section {
+  padding: 40px 0 60px;
+  position: relative;
+}
+.section-head {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.section-head h2 {
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 8px;
+  position: relative;
+  display: inline-block;
+}
+.section-head h2::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+.section-head p {
+  font-size: 15px;
+  color: var(--ink-sub);
+}
+
+/* ====== Grade cards ====== */
+.grade-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-bottom: 32px;
+}
+.grade-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.grade-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.grade-card:hover::before { transform: scaleX(1); }
+.grade-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary);
+}
+.grade-card.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.15), var(--shadow-lg);
+}
+.grade-card.active::before { transform: scaleX(1); }
+.grade-card.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.grade-card.locked:hover {
+  transform: none;
+  box-shadow: var(--shadow-md);
+  border-color: var(--line);
+}
+.grade-card.locked:hover::before { transform: scaleX(0); }
+
+.grade-icon {
+  width: 64px; height: 64px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  background: linear-gradient(135deg, var(--primary-light), #fff);
+  border-radius: 50%;
+  border: 2px solid var(--primary-light);
+}
+.grade-card.locked .grade-icon {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+.grade-card h3 {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.grade-card .grade-sub {
+  font-size: 13px;
+  color: var(--ink-sub);
+  margin-bottom: 14px;
+  letter-spacing: 1px;
+}
+.grade-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 20px;
+}
+.grade-badge.available {
+  background: #dcfce7;
+  color: #166534;
+}
+.grade-badge.soon {
+  background: #fef3c7;
+  color: #92400e;
+}
+.grade-badge.locked-badge {
+  background: #f1f5f9;
+  color: var(--muted);
+}
+
+/* ====== Semester / Chapter expansion ====== */
+.expansion {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.expansion.open { max-height: 1400px; }
+
+.expansion-inner {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--line);
+  margin-top: -10px;
+}
+
+.semester-tabs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.sem-tab {
+  padding: 11px 26px;
+  border: 2px solid var(--line);
+  background: white;
+  color: var(--ink-sub);
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 26px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.sem-tab.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.25);
+}
+.sem-tab:hover:not(.active) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.semester-panel { display: none; animation: fadeIn 0.4s ease-out; }
+.semester-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.semester-hint {
+  text-align: center;
+  font-size: 14px;
+  color: var(--ink-sub);
+  margin-bottom: 22px;
+}
+
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.chapter-card {
+  background: #f8fafc;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 20px 16px;
+  text-align: center;
+  transition: var(--transition);
+  position: relative;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: not-allowed;
+}
+.chapter-card .ch-id {
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.chapter-card .ch-lock {
+  font-size: 28px;
+  margin: 6px 0;
+}
+.chapter-card .ch-note {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.chapter-card.available {
+  background: linear-gradient(135deg, #fffef5 0%, #fffaf0 100%);
+  border-color: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+}
+.chapter-card.available:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(245, 158, 11, 0.25);
+  border-color: var(--accent-dark);
+}
+.chapter-card.available .ch-id {
+  color: var(--accent-dark);
+}
+.chapter-card.available .ch-icon {
+  font-size: 34px;
+  margin: 4px 0 8px;
+}
+.chapter-card.available .ch-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.chapter-card.available .ch-cta {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 700;
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.chapter-card.available:hover .ch-cta {
+  color: var(--primary-dark);
+}
+
+/* ====== Teacher floating button ====== */
+.teacher-fab {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 22px;
+  background: var(--ink);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.3);
+  transition: var(--transition);
+  text-decoration: none;
+  font-family: inherit;
+  border: none;
+}
+.teacher-fab:hover {
+  background: var(--primary-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(21, 101, 192, 0.4);
+}
+.teacher-fab .lock-mini {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+/* ====== Footer ====== */
+footer {
+  padding: 32px 0 100px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  border-top: 1px solid var(--line);
+  margin-top: 40px;
+}
+footer .footer-brand {
+  font-weight: 900;
+  color: var(--primary-dark);
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+
+/* ====== Empty-state for empty grade expansion ====== */
+.locked-grade-msg {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--ink-sub);
+}
+.locked-grade-msg .big-icon {
+  font-size: 56px;
+  display: block;
+  margin-bottom: 14px;
+  opacity: 0.6;
+}
+.locked-grade-msg h4 {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 760px) {
+  .hero { padding: 60px 0 40px; }
+  .grade-grid { grid-template-columns: 1fr; }
+  .chapter-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-stats { gap: 24px; }
+  .teacher-fab { right: 16px; bottom: 16px; padding: 12px 18px; font-size: 13px; }
+  .container { padding: 0 16px; }
+  .expansion-inner { padding: 20px 16px; }
+  .sem-tab { padding: 9px 18px; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ====== Hero ====== -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="container">
+    <div class="hero-crest">
+      <span class="dot"></span>
+      <span>EST. 2026 互動輔助教材</span>
+      <span class="dot"></span>
+    </div>
+    <h1>國中歷史 <span class="accent">CAI 互動學習</span></h1>
+    <p class="tagline">從戰後臺灣出發，透過互動挑戰與多媒體教材，帶你走過經濟起飛、社會變遷與文化演進的關鍵年代。</p>
+    <button class="hero-cta" onclick="document.getElementById('grades').scrollIntoView({behavior:'smooth'})">
+      <span>開始學習</span>
+      <span>↓</span>
+    </button>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="num">3</div>
+        <div class="label">年級</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">6</div>
+        <div class="label">學期</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">36+</div>
+        <div class="label">章節</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">3</div>
+        <div class="label">關卡挑戰</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Grades ====== -->
+<section class="section" id="grades">
+  <div class="container">
+    <div class="section-head">
+      <h2>選擇年級</h2>
+      <p>依國中三年進度，循序漸進掌握臺灣歷史脈絡</p>
+    </div>
+
+    <div class="grade-grid" id="gradeGrid">
+      <!-- 年級卡片由 JS 渲染 -->
+    </div>
+
+    <!-- 展開區 -->
+    <div class="expansion" id="expansion">
+      <div class="expansion-inner" id="expansionInner">
+        <!-- 學期/章節由 JS 渲染 -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Footer ====== -->
+<footer>
+  <div class="container">
+    <div class="footer-brand">國中歷史 CAI 互動學習平台</div>
+    <div>© 2026 互動輔助教材 · 通關成績串接 Firestore · 教師後台獨立管理</div>
+  </div>
+</footer>
+
+<!-- ====== Teacher floating button ====== -->
+<a class="teacher-fab" href="teacher.html" target="_blank" rel="noopener">
+  <span>teacher</span>
+  <span class="lock-mini">🔒</span>
+</a>
+
+<script>
+// ====== 課程資料模型 ======
+// 已開放章節：填入 { id, title, url }
+// 未開放章節：保持 { id, status: 'locked' }
+const CURRICULUM = [
+  {
+    grade: 7,
+    label: '七年級',
+    subtitle: '國中一年級',
+    icon: '📚',
+    badge: 'available',
+    badgeText: '已開放',
+    semesters: [
+      {
+        label: '上學期',
+        hint: '第一學期 · 臺灣史前與早期發展',
+        chapters: [
+          { id: 'L01', status: 'locked' },
+          { id: 'L02', status: 'locked' },
+          { id: 'L03', status: 'locked' },
+          { id: 'L04', status: 'locked' },
+          { id: 'L05', status: 'locked' },
+          { id: 'L06', status: 'locked' }
+        ]
+      },
+      {
+        label: '下學期',
+        hint: '第二學期 · 戰後臺灣的外交與兩岸關係、經濟與社會',
+        chapters: [
+          { id: 'L01', status: 'locked' },
+          { id: 'L02', status: 'locked' },
+          { id: 'L03', status: 'locked' },
+          { id: 'L04', status: 'locked' },
+          { id: 'L05', title: '臺海兩岸關係的演變', url: 'l05cross-strait-relations.html', status: 'available' },
+          { id: 'L06', title: '戰後臺灣的經濟與社會', url: 'l06 economy-society.html', status: 'available' }
+        ]
+      }
+    ]
+  },
+  {
+    grade: 8,
+    label: '八年級',
+    subtitle: '國中二年級',
+    icon: '🏛️',
+    badge: 'soon',
+    badgeText: '即將推出',
+    locked: true,
+    semesters: [
+      { label: '上學期', chapters: [] },
+      { label: '下學期', chapters: [] }
+    ]
+  },
+  {
+    grade: 9,
+    label: '九年級',
+    subtitle: '國中三年級',
+    icon: '🌐',
+    badge: 'locked',
+    badgeText: '敬請期待',
+    locked: true,
+    semesters: [
+      { label: '上學期', chapters: [] },
+      { label: '下學期', chapters: [] }
+    ]
+  }
+];
+
+// ====== 渲染年級卡片 ======
+const gradeGrid = document.getElementById('gradeGrid');
+const expansion = document.getElementById('expansion');
+const expansionInner = document.getElementById('expansionInner');
+let activeGrade = null;
+
+function renderGradeCards() {
+  gradeGrid.innerHTML = CURRICULUM.map(g => {
+    const lockClass = g.locked ? 'locked' : '';
+    const activeClass = activeGrade === g.grade ? 'active' : '';
+    const icon = g.locked ? '🔒' : g.icon;
+    return `
+      <div class="grade-card ${lockClass} ${activeClass}" data-grade="${g.grade}">
+        <div class="grade-icon">${icon}</div>
+        <h3>${g.label}</h3>
+        <div class="grade-sub">${g.subtitle}</div>
+        <span class="grade-badge ${g.badge}">${g.badgeText}</span>
+      </div>
+    `;
+  }).join('');
+
+  gradeGrid.querySelectorAll('.grade-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const grade = parseInt(card.dataset.grade, 10);
+      const data = CURRICULUM.find(c => c.grade === grade);
+      if (data.locked) {
+        renderLockedGradeExpansion(data);
+        openExpansion();
+        activeGrade = grade;
+        renderGradeCards();
+        return;
+      }
+      if (activeGrade === grade) {
+        closeExpansion();
+        activeGrade = null;
+        renderGradeCards();
+      } else {
+        activeGrade = grade;
+        renderGradeCards();
+        renderSemesterExpansion(data);
+        openExpansion();
+      }
+    });
+  });
+}
+
+function openExpansion() {
+  expansion.classList.add('open');
+}
+function closeExpansion() {
+  expansion.classList.remove('open');
+  setTimeout(() => { expansionInner.innerHTML = ''; }, 400);
+}
+
+// ====== 渲染學期展開（已開放年級） ======
+function renderSemesterExpansion(gradeData) {
+  const sems = gradeData.semesters;
+  let defaultSem = 0;
+  // 若第一學期全鎖定，第二學期有可用章節，預設顯示第二學期
+  const firstHasAvail = sems[0].chapters.some(c => c.status === 'available');
+  if (!firstHasAvail && sems[1] && sems[1].chapters.some(c => c.status === 'available')) {
+    defaultSem = 1;
+  }
+
+  const tabsHtml = sems.map((s, i) => `
+    <button class="sem-tab ${i === defaultSem ? 'active' : ''}" data-sem="${i}">
+      <span>📘</span><span>${s.label}</span>
+    </button>
+  `).join('');
+
+  const panelsHtml = sems.map((s, i) => `
+    <div class="semester-panel ${i === defaultSem ? 'active' : ''}" data-sem-panel="${i}">
+      <div class="semester-hint">${s.hint || s.label + ' · 陸續更新中'}</div>
+      <div class="chapter-grid">
+        ${renderChapters(s.chapters)}
+      </div>
+    </div>
+  `).join('');
+
+  expansionInner.innerHTML = `
+    <div class="semester-tabs">${tabsHtml}</div>
+    ${panelsHtml}
+  `;
+
+  expansionInner.querySelectorAll('.sem-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const idx = tab.dataset.sem;
+      expansionInner.querySelectorAll('.sem-tab').forEach(t => t.classList.remove('active'));
+      expansionInner.querySelectorAll('.semester-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      expansionInner.querySelector(`.semester-panel[data-sem-panel="${idx}"]`).classList.add('active');
+    });
+  });
+
+  bindChapterCards();
+}
+
+function renderChapters(chapters) {
+  if (!chapters || chapters.length === 0) {
+    return `
+      <div class="locked-grade-msg" style="grid-column: 1 / -1;">
+        <span class="big-icon">🚧</span>
+        <h4>章節準備中</h4>
+        <p>敬請期待後續更新</p>
+      </div>
+    `;
+  }
+  return chapters.map(c => {
+    if (c.status === 'available') {
+      return `
+        <a class="chapter-card available" href="${c.url}" target="_blank" rel="noopener">
+          <div class="ch-id">${c.id}</div>
+          <div class="ch-icon">✨</div>
+          <div class="ch-title">${c.title}</div>
+          <div class="ch-cta">進入課程 →</div>
+        </a>
+      `;
+    }
+    return `
+      <div class="chapter-card">
+        <div class="ch-id">${c.id}</div>
+        <div class="ch-lock">🔒</div>
+        <div class="ch-note">尚未開放</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function bindChapterCards() {
+  // available 章節為 <a>，自動新分頁開啟，不需額外綁定
+}
+
+// ====== 渲染鎖定年級的展開 ======
+function renderLockedGradeExpansion(gradeData) {
+  expansionInner.innerHTML = `
+    <div class="locked-grade-msg">
+      <span class="big-icon">${gradeData.icon}</span>
+      <h4>${gradeData.label}課程即將推出</h4>
+      <p>我們正緊鑼密鼓籌備 ${gradeData.subtitle} 的歷史互動教材，敬請期待！</p>
+    </div>
+  `;
+}
+
+// ====== 啟動 ======
+renderGradeCards();
+</script>
+
+</body>
+</html>

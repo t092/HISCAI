@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>台灣經濟發展小遊戲 - 機器人出擊</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh;
+    background: #111827;
+    user-select: none;
+  }
+  .game-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* 遊戲畫布 — 背景圖片 + 無縫向下捲動 */
+  .canvas {
+    position: relative;
+    width: 800px; height: 500px;
+    background: url('images/BkgG.jpg') 50% 0 / 100% 100% repeat-y;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    animation: bgScroll 8s linear infinite;
+  }
+  @keyframes bgScroll {
+    from { background-position: 50% 0; }
+    to   { background-position: 50% 500px; }
+  }
+
+  /* 標題列 — TiGBar.jpg */
+  .title-bar {
+    width: 800px; height: 64px;
+    background: url('images/TiGBar.jpg') center / contain no-repeat;
+  }
+
+  /* 心形 */
+  .hearts-bar {
+    position: absolute;
+    top: 8px; right: 12px;
+    display: flex; gap: 3px;
+    z-index: 50;
+  }
+  .hearts-bar .heart {
+    font-size: 22px;
+    transition: all 0.3s;
+  }
+  .hearts-bar .heart.lost {
+    filter: grayscale(1) brightness(0.35);
+    transform: scale(0.7);
+  }
+
+  /* 關卡資訊 */
+  .level-badge {
+    position: absolute;
+    top: 8px; left: 12px;
+    background: rgba(0,0,0,0.55);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    z-index: 50;
+  }
+
+  /* 題目 */
+  .question {
+    background: rgba(30,41,59,0.92);
+    color: #f8fafc;
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 10px 24px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    width: 800px;
+  }
+
+  /* 計分 */
+  .score-badge {
+    position: absolute;
+    top: 40px; right: 14px;
+    background: rgba(0,0,0,0.5);
+    color: #fcd34d;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    z-index: 50;
+  }
+
+  /* 氣球 */
+  .balloon {
+    position: absolute;
+    width: 110px; height: 136px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    display: flex;
+    align-items: center; justify-content: center;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+    padding: 10px;
+    box-shadow: inset -8px -8px 18px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.3);
+    transition: opacity 0.4s;
+    line-height: 1.3;
+    z-index: 20;
+  }
+  .balloon::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 50%;
+    width: 2px; height: 20px;
+    background: rgba(0,0,0,0.2);
+    transform: translateX(-50%);
+  }
+  .balloon .text {
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  }
+  .balloon.floating {
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .balloon.crashed {
+    animation: crash 0.5s forwards;
+  }
+  @keyframes crash {
+    0% { transform: scale(1); opacity: 1; }
+    30% { transform: scale(1.3); }
+    100% { transform: scale(0); opacity: 0; }
+  }
+
+  /* 氣球顏色 */
+  .b1 { background: radial-gradient(circle at 30% 30%, #ff8a80, #c62828); }
+  .b2 { background: radial-gradient(circle at 30% 30%, #ffd180, #e65100); }
+  .b3 { background: radial-gradient(circle at 30% 30%, #ffff8d, #f9a825); color: #333; }
+  .b4 { background: radial-gradient(circle at 30% 30%, #b9f6ca, #2e7d32); }
+
+  /* 機器人 - idle 循環第1~3幀 */
+  .robot {
+    position: absolute;
+    width: 48px; height: 48px;
+    background-image: url('images/robot.png');
+    background-size: 192px 48px;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    z-index: 30;
+    filter: drop-shadow(0 0 8px #60a5fa);
+  }
+  .robot.idle {
+    animation: robotIdle 0.9s steps(3) infinite;
+  }
+  @keyframes robotIdle {
+    from { background-position: 0 0; }
+    to   { background-position: -144px 0; }
+  }
+  .robot.walking {
+    animation: robotWalk 0.35s steps(2) infinite;
+  }
+  @keyframes robotWalk {
+    from { background-position: 0 0; }
+    to   { background-position: -96px 0; }
+  }
+  .robot.boom {
+    filter: drop-shadow(0 0 16px #ef4444);
+    animation: robotBoom 0.6s forwards;
+  }
+  @keyframes robotBoom {
+    0%,100% { transform: translate(0,0) rotate(0); }
+    20% { transform: translate(-8px,-4px) rotate(-5deg); }
+    50% { transform: translate(8px,2px) rotate(5deg); }
+    80% { transform: translate(-4px,-2px) rotate(-3deg); }
+  }
+
+  /* 撞擊火花 */
+  .spark {
+    position: absolute;
+    font-size: 50px;
+    z-index: 50;
+    pointer-events: none;
+    animation: sparkPop 0.8s ease-out forwards;
+  }
+  @keyframes sparkPop {
+    0% { transform: scale(0); opacity: 1; }
+    25% { transform: scale(1.6); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  /* 彩帶 */
+  .confetti {
+    position: absolute;
+    pointer-events: none;
+    z-index: 200;
+    animation: confettiFall 2.5s linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-10px) rotate(0); opacity: 1; }
+    100% { transform: translateY(520px) rotate(720deg); opacity: 0.7; }
+  }
+
+  /* 操作提示 */
+  .hint {
+    width: 800px;
+    background: rgba(0,0,0,0.5);
+    color: #ccc;
+    padding: 6px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    text-align: center;
+  }
+  .hint .key {
+    display: inline-block;
+    background: white;
+    color: #1e293b;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+    margin: 0 1px;
+  }
+
+  /* 光束 */
+  .beam {
+    position: absolute;
+    width: 8px;
+    background: linear-gradient(0deg, transparent, #00ffff, #00bfff);
+    box-shadow: 0 0 12px #00ffff, 0 0 24px #0066ff;
+    z-index: 35;
+    pointer-events: none;
+    animation: beamFlash 0.3s ease-out forwards;
+  }
+  @keyframes beamFlash {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
+  /* 開始/結束畫面 */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.82);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 500;
+    color: white;
+    text-align: center;
+    border-radius: 16px;
+  }
+  .overlay.hidden { display: none; }
+  .overlay h1 { font-size: 30px; margin-bottom: 12px; color: #fcd34d; }
+  .overlay p { font-size: 14px; margin-bottom: 18px; line-height: 1.6; max-width: 500px; }
+  .overlay button {
+    padding: 10px 28px;
+    font-size: 15px;
+    border: none;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #f97316, #dc2626);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .overlay button:hover { transform: scale(1.08); }
+</style>
+</head>
+<body>
+
+<div class="game-wrapper">
+  <div class="title-bar"></div>
+  <div class="question" id="question">
+    <span id="qText">題目載入中...</span>
+  </div>
+
+<div class="canvas" id="canvas">
+  <div class="hearts-bar" id="hearts">
+    <span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span>
+  </div>
+  <div class="level-badge">關卡 <b id="levelNum">1</b>/<b>10</b></div>
+  <div class="score-badge">⭐ <b id="score">0</b></div>
+
+  <div class="robot idle" id="robot"></div>
+
+  <div class="overlay" id="startOverlay">
+    <h1>🤖 機器人出擊</h1>
+    <p>
+      用 <b>方向鍵</b> 移動機器人 · <b>Space</b> 發射光束射擊氣球<br><br>
+      ❤️ 3 條命，射錯扣 30 分並少一條命<br>
+      🎯 每過一關回復一條命（最多 3 條）<br>
+      🔥 共 10 關，從 32 題中隨機抽選，挑戰最高分！
+    </p>
+    <button onclick="startGame()">開始出擊</button>
+  </div>
+
+  <div class="overlay hidden" id="endOverlay">
+    <h1 id="endTitle">🎉 遊戲結束！</h1>
+    <p id="endMsg"></p>
+    <button onclick="startGame()">再玩一次</button>
+  </div>
+</div>
+
+  <div class="hint">
+    移動 <span class="key">←</span><span class="key">↑</span><span class="key">↓</span><span class="key">→</span>
+    <span class="key">Space</span> 發射光束射擊答案
+  </div>
+</div>
+
+<script>
+const CANVAS_W = 800;
+const CANVAS_H = 500;
+const ROBOT_S = 48;
+
+const QUESTIONS = [
+  /* ===== 經濟發展題庫 ===== */
+  { cat: '進口替代', q: '「以農業培養工業」是哪個時期的政策？', a: '進口替代', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '進口替代', q: '民國 40 年代臺灣採取的經濟政策是？', a: '進口替代', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '進口替代', q: '「保護國內產業、管制國外產品進口」屬於哪個策略？', a: '進口替代', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '出口導向', q: '「設立加工出口區」是哪個時期的政策？', a: '出口導向', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '出口導向', q: '民國 50 年代臺灣採取「輸出食品等輕工業」的策略是？', a: '出口導向', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '出口導向', q: '在高雄等地設置加工出口區，是哪個政策？', a: '出口導向', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '十大建設', q: '蔣經國院長推動的基礎建設是？', a: '十大建設', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '十大建設', q: '因中東石油危機而推動的政策是？', a: '十大建設', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '十大建設', q: '「帶動重化工業發展」是哪個政策的成果？', a: '十大建設', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '產業升級', q: '「新竹科學工業園區」屬於哪個政策？', a: '產業升級', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '產業升級', q: '「發展高科技產業」是民國幾年起的政策？', a: '產業升級', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+  { cat: '產業升級', q: '「資訊、電子等高附加價值產業」屬於？', a: '產業升級', opts: ['進口替代','出口導向','十大建設','產業升級'] },
+
+  /* ===== 社會變遷題庫 ===== */
+  { cat: '社會變遷', q: '戰後臺灣由什麼社會轉型為工業社會？', a: '農業社會', opts: ['漁業社會','農業社會','商業社會','遊牧社會'] },
+  { cat: '社會變遷', q: '解嚴後哪類運動興起，為自身權益發聲？', a: '社會運動', opts: ['體育競賽','社會運動','選舉活動','宗教活動'] },
+  { cat: '社會變遷', q: '農村、部落、山村與漁村主要面臨什麼問題？', a: '人口外移與老化', opts: ['天災頻繁','人口外移與老化','交通不便','教育不足'] },
+  { cat: '社會變遷', q: '戰後政府推行什麼運動，造成許多族群語言文化受衝擊？', a: '國語運動', opts: ['國語運動','母語運動','英語運動','日語運動'] },
+  { cat: '社會變遷', q: '政府將原住民稱為什麼，要求以漢名登記戶籍？', a: '山胞', opts: ['原住民','山胞','山地人','少數民族'] },
+  { cat: '社會變遷', q: '民國 83 年修憲，將「山胞」改稱為什麼？', a: '原住民', opts: ['原住民','山胞','臺灣人','少數民族'] },
+  { cat: '社會變遷', q: '原住民運動爭取權益的兩大目標是？', a: '正名與自治', opts: ['經濟與教育','正名與自治','工作與土地','語言與文化'] },
+  { cat: '社會變遷', q: '民國 60 年代以臺灣鄉土民情為題材，關注小人物的文學是？', a: '鄉土文學', opts: ['現代文學','鄉土文學','網路文學','古典文學'] },
+  { cat: '社會變遷', q: '民國 60 年代校園民歌的時代背景與下列何者有關？', a: '外交挫敗', opts: ['經濟起飛','外交挫敗','社會運動','教育改革'] },
+  { cat: '社會變遷', q: '戰後初期，政府為強化國家認同，大力提倡什麼文化？', a: '中華文化', opts: ['日本文化','中華文化','美國文化','西洋文化'] },
+  { cat: '社會變遷', q: '韓戰後哪國流行文化透過美軍電臺傳入臺灣？', a: '美國', opts: ['日本','美國','英國','法國'] },
+  { cat: '社會變遷', q: '民國 70 年代後，臺灣文化的發展趨勢為何？', a: '多元文化', opts: ['單一文化','多元文化','傳統文化','外來文化'] },
+  { cat: '社會變遷', q: '近年來使臺灣文化更加豐富的新族群是？', a: '新住民與國際移工', opts: ['觀光客','留學生','新住民與國際移工','商人'] },
+  { cat: '社會變遷', q: '解嚴後臺灣社會運動的自主空間變得如何？', a: '擴大', opts: ['縮小','不變','擴大','消失'] },
+  { cat: '社會變遷', q: '戰後臺灣經濟起飛，造成什麼差距擴大等問題？', a: '城鄉差距', opts: ['南北差距','城鄉差距','貧富差距','世代差距'] },
+  { cat: '社會變遷', q: '戰後臺灣哪類工業因「以農業培養工業」而興起？', a: '輕工業', opts: ['重工業','輕工業','高科技業','服務業'] },
+  { cat: '社會變遷', q: '鄉土文學的重要作家黃春明，作品《兒子的大玩偶》屬於？', a: '鄉土文學', opts: ['現代文學','鄉土文學','科幻小說','推理小說'] },
+  { cat: '社會變遷', q: '解嚴後新興的臺語搖滾代表人物有林強、伍佰，這屬於？', a: '另類音樂', opts: ['校園民歌','另類音樂','古典音樂','流行情歌'] },
+  { cat: '社會變遷', q: '戰後臺灣都市化造成人口集中到哪裡？', a: '都市', opts: ['鄉村','都市','山上','海外'] },
+  { cat: '社會變遷', q: '美軍電臺（ICRT 前身）主要播放哪類音樂？', a: '西洋歌曲', opts: ['國語老歌','臺語歌曲','西洋歌曲','日本歌曲'] }
+];
+
+const COLORS = ['b1','b2','b3','b4'];
+const BALLOON_W = 110, BALLOON_H = 136;
+const BALLOON_POSITIONS = [
+  { left: 40,  top: 55 },
+  { left: 240, top: 40 },
+  { left: 440, top: 48 },
+  { left: 640, top: 60 }
+];
+const ARROW_KEYS = ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'];
+const MOVE_SPEED = 4;
+const ROBOT_MIN_Y = Math.round(CANVAS_H * 0.4); // 機器人上限：畫面高度 60% 起（上方 40% 禁區）
+
+const canvas = document.getElementById('canvas');
+const robot = document.getElementById('robot');
+const dom = {
+  startOverlay: document.getElementById('startOverlay'),
+  endOverlay:   document.getElementById('endOverlay'),
+  hearts:       document.querySelectorAll('#hearts .heart'),
+  levelNum:     document.getElementById('levelNum'),
+  score:        document.getElementById('score'),
+  qText:        document.getElementById('qText'),
+  endTitle:     document.getElementById('endTitle'),
+  endMsg:       document.getElementById('endMsg'),
+};
+
+let state = {
+  level: 0, score: 0, lives: 3, maxLives: 3,
+  balloons: [],
+  robot: { x: CANVAS_W/2 - ROBOT_S/2, y: CANVAS_H - 100 },
+  locked: false,
+  gameOver: false,
+  questions: [],
+  totalLevels: 10,
+  keys: {},
+  target: null
+};
+
+/* ===== 音效系統（Web Audio API 合成）===== */
+const sfx = {
+  ctx: null,
+  master: null,
+  musicGain: null,
+  musicTimer: null,
+  musicPlaying: false,
+
+  init() {
+    if (this.ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    this.ctx = new AC();
+    this.master = this.ctx.createGain();
+    this.master.gain.value = 0.4;
+    this.master.connect(this.ctx.destination);
+    this.musicGain = this.ctx.createGain();
+    this.musicGain.gain.value = 0.12;
+    this.musicGain.connect(this.ctx.destination);
+  },
+
+  // 內部：播放一個帶 envelope 的音
+  tone({ freq=440, type='sine', dur=0.2, vol=0.3, slideTo=null, delay=0 }) {
+    if (!this.ctx) return;
+    const t0 = this.ctx.currentTime + delay;
+    const osc = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t0);
+    if (slideTo !== null) osc.frequency.exponentialRampToValueAtTime(Math.max(1, slideTo), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g); g.connect(this.master);
+    osc.start(t0); osc.stop(t0 + dur + 0.02);
+  },
+
+  // 白噪音爆裂（爆炸用）
+  noise({ dur=0.3, vol=0.4, delay=0 }) {
+    if (!this.ctx) return;
+    const t0 = this.ctx.currentTime + delay;
+    const buf = this.ctx.createBuffer(1, this.ctx.sampleRate * dur, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i/data.length);
+    const src = this.ctx.createBufferSource();
+    src.buffer = buf;
+    const g = this.ctx.createGain();
+    g.gain.setValueAtTime(vol, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass'; filter.frequency.value = 800;
+    src.connect(filter); filter.connect(g); g.connect(this.master);
+    src.start(t0); src.stop(t0 + dur);
+  },
+
+  // 光束發射：鋸齒波高頻下滑
+  fire() {
+    this.tone({ freq: 880, slideTo: 220, type: 'sawtooth', dur: 0.15, vol: 0.25 });
+  },
+
+  // 命中正確：C5-E5-G5 上行琶音
+  correct() {
+    this.tone({ freq: 523, type: 'triangle', dur: 0.18, vol: 0.3, delay: 0   });
+    this.tone({ freq: 659, type: 'triangle', dur: 0.18, vol: 0.3, delay: 0.1 });
+    this.tone({ freq: 784, type: 'triangle', dur: 0.3,  vol: 0.3, delay: 0.2 });
+  },
+
+  // 命中錯誤：低頻下滑 + 噪音爆裂
+  wrong() {
+    this.tone({ freq: 220, slideTo: 80, type: 'sawtooth', dur: 0.4, vol: 0.35 });
+    this.noise({ dur: 0.3, vol: 0.3 });
+  },
+
+  // 失去生命：G4→C4 下行
+  loseLife() {
+    this.tone({ freq: 392, type: 'square', dur: 0.15, vol: 0.25, delay: 0   });
+    this.tone({ freq: 262, type: 'square', dur: 0.25, vol: 0.25, delay: 0.15 });
+  },
+
+  // 進關：短琶音
+  levelUp() {
+    this.tone({ freq: 659, type: 'triangle', dur: 0.12, vol: 0.25, delay: 0   });
+    this.tone({ freq: 784, type: 'triangle', dur: 0.12, vol: 0.25, delay: 0.1 });
+    this.tone({ freq: 988, type: 'triangle', dur: 0.2,  vol: 0.25, delay: 0.2 });
+  },
+
+  // 完美通關：C5-E5-G5-C6 凱旋琶音 + 持續和弦
+  win() {
+    [523, 659, 784, 1047].forEach((f, i) => {
+      this.tone({ freq: f, type: 'triangle', dur: 0.25, vol: 0.3, delay: i * 0.12 });
+    });
+    // 持續和弦
+    [523, 659, 784].forEach(f => {
+      this.tone({ freq: f, type: 'sine', dur: 1.0, vol: 0.15, delay: 0.5 });
+    });
+  },
+
+  // 陣亡：G4-E4-C4 下行哀鳴
+  lose() {
+    this.tone({ freq: 392, slideTo: 330, type: 'sawtooth', dur: 0.3, vol: 0.3, delay: 0   });
+    this.tone({ freq: 330, slideTo: 262, type: 'sawtooth', dur: 0.4, vol: 0.3, delay: 0.3 });
+    this.tone({ freq: 262, slideTo: 180, type: 'sawtooth', dur: 0.6, vol: 0.3, delay: 0.7 });
+  },
+
+  // ===== 背景音樂：簡單循環旋律 =====
+  startMusic() {
+    if (!this.ctx || this.musicPlaying) return;
+    this.musicPlaying = true;
+    // C 大調五聲音階簡單旋律（方波，活潑）
+    const melody = [
+      523, 659, 784, 659, 523, 587, 659, 523,
+      784, 880, 784, 659, 523, 659, 784, 659
+    ];
+    const beat = 0.28; // 每音 0.28 秒
+    let i = 0;
+    const playNote = () => {
+      if (!this.musicPlaying) return;
+      const f = melody[i % melody.length];
+      const t0 = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.5, t0 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + beat * 0.9);
+      osc.connect(g); g.connect(this.musicGain);
+      osc.start(t0); osc.stop(t0 + beat);
+      // 低音根音（每 4 拍一次）
+      if (i % 4 === 0) {
+        const bass = this.ctx.createOscillator();
+        const bg = this.ctx.createGain();
+        bass.type = 'triangle';
+        bass.frequency.value = f / 4;
+        bg.gain.setValueAtTime(0.0001, t0);
+        bg.gain.exponentialRampToValueAtTime(0.6, t0 + 0.02);
+        bg.gain.exponentialRampToValueAtTime(0.0001, t0 + beat * 3.5);
+        bass.connect(bg); bg.connect(this.musicGain);
+        bass.start(t0); bass.stop(t0 + beat * 4);
+      }
+      i++;
+      this.musicTimer = setTimeout(playNote, beat * 1000);
+    };
+    playNote();
+  },
+
+  stopMusic() {
+    this.musicPlaying = false;
+    if (this.musicTimer) { clearTimeout(this.musicTimer); this.musicTimer = null; }
+  }
+};
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startGame() {
+  sfx.init();
+  sfx.startMusic();
+  dom.startOverlay.classList.add('hidden');
+  dom.endOverlay.classList.add('hidden');
+  state.level = 0; state.score = 0; state.lives = state.maxLives;
+  state.questions = shuffle(QUESTIONS).slice(0, state.totalLevels);
+  state.robot = { x: CANVAS_W/2 - ROBOT_S/2, y: CANVAS_H - 100 };
+  state.locked = false; state.keys = {}; state.gameOver = false; state.target = null;
+  robot.classList.remove('boom', 'walking');
+  updateUI();
+  loadLevel();
+}
+
+function updateUI() {
+  dom.hearts.forEach((h, i) => h.classList.toggle('lost', i >= state.lives));
+  dom.levelNum.textContent = state.level + 1;
+  dom.score.textContent = state.score;
+}
+
+function loadLevel() {
+  if (state.gameOver) return;
+  if (state.level >= state.totalLevels) { endGame(true); return; }
+  state.locked = false; state.balloons = []; state.target = null;
+  document.querySelectorAll('.balloon').forEach(b => b.remove());
+
+  const q = state.questions[state.level];
+  dom.qText.textContent = q.q;
+  spawnBalloons(q);
+  state.robot.x = CANVAS_W/2 - ROBOT_S/2;
+  state.robot.y = CANVAS_H - 100;
+  positionRobot();
+  updateUI();
+  if (state.level > 0) sfx.levelUp();
+}
+
+function spawnBalloons(q) {
+  const picks = shuffle(q.opts);
+  picks.forEach((text, i) => {
+    const b = document.createElement('div');
+    b.className = `balloon ${COLORS[i]} floating`;
+    b.style.left = BALLOON_POSITIONS[i].left + 'px';
+    b.style.top  = BALLOON_POSITIONS[i].top  + 'px';
+    b.style.animationDelay = (i * 0.3) + 's';
+    const textDiv = document.createElement('div');
+    textDiv.className = 'text';
+    textDiv.textContent = text;
+    b.appendChild(textDiv);
+    b.dataset.answer = text;
+    b.dataset.correct = text === q.a;
+    b._pos = {
+      x: BALLOON_POSITIONS[i].left + BALLOON_W/2,
+      y: BALLOON_POSITIONS[i].top  + BALLOON_H/2
+    };
+    canvas.appendChild(b);
+    state.balloons.push(b);
+  });
+}
+
+function positionRobot() {
+  robot.style.left = state.robot.x + 'px';
+  robot.style.top  = state.robot.y + 'px';
+}
+
+// 光束射擊：尋找光束路徑上的氣球
+function findBalloonInBeamPath(beamX) {
+  let closest = null;
+  let closestY = -Infinity;
+  for (const b of state.balloons) {
+    if (b.classList.contains('crashed')) continue;
+    if (beamX >= b._pos.x - BALLOON_W/2 && beamX <= b._pos.x + BALLOON_W/2) {
+      if (b._pos.y > closestY) { closestY = b._pos.y; closest = b; }
+    }
+  }
+  return closest;
+}
+
+function fireBeam() {
+  if (state.locked || state.gameOver) return;
+  const bx = state.robot.x + ROBOT_S/2;
+
+  // 光束視覺
+  const beam = document.createElement('div');
+  beam.className = 'beam';
+  beam.style.left = (bx - 4) + 'px';
+  beam.style.top = '0px';
+  beam.style.height = (state.robot.y + 10) + 'px';
+  canvas.appendChild(beam);
+  setTimeout(() => beam.remove(), 300);
+
+  sfx.fire();
+
+  // 命中判定
+  const target = findBalloonInBeamPath(bx);
+  if (target) crash(target);
+}
+
+function crash(b) {
+  if (state.locked || state.gameOver) return;
+  state.locked = true;
+  const isCorrect = b.dataset.correct === 'true';
+
+  // 氣球爆破
+  b.classList.remove('floating');
+  b.classList.add('crashed');
+
+  // 其他氣球淡出
+  state.balloons.forEach(o => {
+    if (o !== b) {
+      o.classList.remove('floating');
+      o.style.opacity = '0.25';
+    }
+  });
+
+  // 火花位置（使用快取中心點，無需 getBoundingClientRect）
+  const sx = b._pos.x - 25;
+  const sy = b._pos.y - 25;
+
+  if (isCorrect) {
+    state.score += 100;
+    spawnSpark(sx, sy, '🎉');
+    spawnConfetti(b._pos.x, b._pos.y);
+    sfx.correct();
+
+    setTimeout(() => {
+      state.level++;
+      if (state.level >= state.totalLevels) { endGame(true); return; }
+      loadLevel();
+    }, 1000);
+
+  } else {
+    state.lives--;
+    state.score = Math.max(0, state.score - 30);
+    spawnSpark(sx, sy, '💥');
+    robot.classList.add('boom');
+    setTimeout(() => robot.classList.remove('boom'), 600);
+    updateUI();
+    sfx.wrong();
+    sfx.loseLife();
+
+    // 生命歸零則結束
+    if (state.lives <= 0) {
+      setTimeout(() => endGame(false), 700);
+      return;
+    }
+
+    // 否則恢復其他氣球，繼續挑戰
+    setTimeout(() => {
+      state.locked = false;
+      state.target = null;
+      robot.classList.remove('walking');
+      state.balloons.forEach(o => {
+        if (!o.classList.contains('crashed')) {
+          o.style.opacity = '1';
+          o.classList.add('floating');
+        }
+      });
+    }, 600);
+  }
+}
+
+function spawnSpark(x, y, emoji) {
+  const e = document.createElement('div');
+  e.className = 'spark';
+  e.textContent = emoji;
+  e.style.left = x + 'px';
+  e.style.top  = y + 'px';
+  canvas.appendChild(e);
+  setTimeout(() => e.remove(), 800);
+}
+
+function spawnConfetti(x, y) {
+  const emojis = ['🍬','🍭','🎊','⭐','🌟','🎈','💖'];
+  for (let i = 0; i < 30; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.fontSize = (14 + Math.random() * 14) + 'px';
+    c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    c.style.left = (x + (Math.random() - 0.5) * 300) + 'px';
+    c.style.top = (y - 20) + 'px';
+    c.style.animationDelay = Math.random() * 0.2 + 's';
+    c.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+    canvas.appendChild(c);
+    setTimeout(() => c.remove(), 3500);
+  }
+}
+
+function endGame(won) {
+  state.gameOver = true;
+  sfx.stopMusic();
+  dom.endOverlay.classList.remove('hidden');
+  if (won) {
+    dom.endTitle.textContent = '🏆 完美通關！';
+    dom.endTitle.style.color = '#fcd34d';
+    dom.endMsg.textContent =
+      `擊破全部 10 關！得分：${state.score} 分\n🎉 台灣經濟發展與社會變遷你全都學會了！`;
+    sfx.win();
+  } else {
+    dom.endTitle.textContent = '💔 機器人陣亡！';
+    dom.endTitle.style.color = '#ef4444';
+    dom.endMsg.textContent =
+      `撐到第 ${state.level + 1} 關 | 得分：${state.score} 分\n💪 別灰心，再試一次！`;
+    sfx.lose();
+  }
+}
+
+function clampRobot() {
+  state.robot.x = Math.max(0, Math.min(CANVAS_W - ROBOT_S, state.robot.x));
+  state.robot.y = Math.max(ROBOT_MIN_Y, Math.min(CANVAS_H - ROBOT_S - 10, state.robot.y));
+}
+
+// 遊戲迴圈
+function gameLoop() {
+  if (!state.locked && !state.gameOver && state.balloons.length > 0) {
+    const prevX = state.robot.x, prevY = state.robot.y;
+    let keyboardActive = false;
+
+    // 鍵盤移動（在迴圈中處理，避免 OS 鍵重複速率影響速度）
+    let dx = 0, dy = 0;
+    if (state.keys['ArrowLeft'])  dx -= 1;
+    if (state.keys['ArrowRight']) dx += 1;
+    if (state.keys['ArrowUp'])    dy -= 1;
+    if (state.keys['ArrowDown'])  dy += 1;
+    if (dx !== 0 || dy !== 0) {
+      if (dx !== 0 && dy !== 0) { dx *= 0.7071; dy *= 0.7071; } // 斜向歸一化
+      state.robot.x += dx * MOVE_SPEED;
+      state.robot.y += dy * MOVE_SPEED;
+      keyboardActive = true;
+    }
+
+    // 滑鼠目標移動
+    let targetActive = false;
+    if (state.target) {
+      const tdx = state.target.x - state.robot.x;
+      const tdy = state.target.y - state.robot.y;
+      const dist = Math.hypot(tdx, tdy);
+      if (dist < 6) {
+        state.target = null;
+      } else {
+        state.robot.x += (tdx / dist) * MOVE_SPEED;
+        state.robot.y += (tdy / dist) * MOVE_SPEED;
+        targetActive = true;
+      }
+    }
+
+    clampRobot();
+
+    // 若 target 活動但被 clamp 完全卡住（點擊到禁區），清除 target 避免無限嘗試
+    if (targetActive && Math.abs(state.robot.x - prevX) < 0.01 && Math.abs(state.robot.y - prevY) < 0.01) {
+      state.target = null;
+    }
+
+    const actuallyMoved = (state.robot.x !== prevX) || (state.robot.y !== prevY);
+    if (keyboardActive || actuallyMoved) {
+      positionRobot();
+      if (!robot.classList.contains('walking')) robot.classList.add('walking');
+    }
+  }
+  requestAnimationFrame(gameLoop);
+}
+
+// 鍵盤輸入：方向鍵移動 / Space 射擊
+// 鍵狀態永遠記錄（即使 locked），遊戲迴圈會根據 locked 決定是否採用
+document.addEventListener('keydown', e => {
+  if (e.key === ' ') { e.preventDefault(); fireBeam(); return; }
+  if (!ARROW_KEYS.includes(e.key)) return;
+  e.preventDefault();
+  state.keys[e.key] = true;
+});
+
+document.addEventListener('keyup', e => {
+  if (!ARROW_KEYS.includes(e.key)) return;
+  state.keys[e.key] = false;
+  if (!state.keys['ArrowLeft'] && !state.keys['ArrowRight'] &&
+      !state.keys['ArrowUp']   && !state.keys['ArrowDown']) {
+    robot.classList.remove('walking');
+  }
+});
+
+// 視窗失焦時清除所有鍵狀態（避免 keyup 遺漏導致卡鍵）
+window.addEventListener('blur', () => {
+  state.keys = {};
+  robot.classList.remove('walking');
+});
+
+requestAnimationFrame(gameLoop);
+
+// 滑鼠點擊移動
+canvas.addEventListener('click', e => {
+  if (state.locked || state.gameOver) return;
+  const rect = canvas.getBoundingClientRect();
+  state.target = {
+    x: e.clientX - rect.left - ROBOT_S/2,
+    y: e.clientY - rect.top  - ROBOT_S/2
+  };
+});
+</script>
+</body>
+</html>

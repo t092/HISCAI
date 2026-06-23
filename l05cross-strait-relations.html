@@ -1,0 +1,2747 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5-2 臺海兩岸關係的演變 - 互動學習網頁</title>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #00796b;
+    --primary-light: #e0f2f1;
+    --primary-dark: #004d40;
+    --accent: #ff6f00;
+    --accent-light: #fff3e0;
+    --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e4ecf5 100%);
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --text-main: #2c3e50;
+    --text-sub: #546e7a;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    --border-radius: 20px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: "Noto Sans TC", "Outfit", sans-serif;
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    color: var(--text-main);
+    line-height: 1.6;
+    padding-bottom: 60px;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* 導航欄與頁首 */
+  header {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 6px; height: 100%;
+    background: linear-gradient(180deg, var(--primary), var(--accent));
+  }
+
+  .header-title h1 {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-title p {
+    font-size: 14px;
+    color: var(--text-sub);
+    margin-top: 4px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 10px;
+    background: #eceff1;
+    padding: 6px;
+    border-radius: 30px;
+  }
+  
+  .tab-btn {
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-sub);
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .tab-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 121, 107, 0.2);
+  }
+  
+  .tab-btn:hover:not(.active) {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-main);
+  }
+
+  /* 核心內容區架構 */
+  .tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  .tab-content.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 提示對話框 / 小助手 */
+  .assistant-bar {
+    background: var(--primary-light);
+    border-left: 5px solid var(--primary);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  }
+  .assistant-avatar {
+    font-size: 40px;
+    animation: bounce 2s infinite ease-in-out;
+  }
+  .assistant-text h4 {
+    color: var(--primary-dark);
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .assistant-text p {
+    font-size: 14px;
+    color: #37474f;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* 卡片基本樣式 */
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  /* ================== 單元一：課程首頁 ================== */
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 24px;
+  }
+  .intro-text h2 {
+    font-size: 28px;
+    color: var(--primary-dark);
+    margin-bottom: 16px;
+  }
+  .intro-text p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #455a64;
+    text-align: justify;
+  }
+  .goals-list {
+    background: #f1f8e9;
+    border-radius: 16px;
+    padding: 20px;
+    border-left: 4px solid #8bc34a;
+  }
+  .goals-list h3 {
+    color: #33691e;
+    margin-bottom: 12px;
+    font-size: 17px;
+  }
+  .goals-list li {
+    list-style: none;
+    font-size: 15px;
+    color: #558b2f;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .goals-list li::before {
+    content: '🎯';
+  }
+
+  .intro-img-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+  }
+  .intro-img-container img {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    transition: var(--transition);
+  }
+  .intro-img-container img:hover {
+    transform: scale(1.02);
+  }
+  .intro-img-container span {
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  /* ================== 單元二：歷史分期 ================== */
+  .timeline-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .timeline-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    border: 3px solid transparent;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .timeline-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 6px;
+  }
+  .timeline-card.t1::after { background: #e53935; }
+  .timeline-card.t2::after { background: #ffb300; }
+  .timeline-card.t3::after { background: #43a047; }
+
+  .timeline-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+  }
+  .timeline-card.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .timeline-card h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .timeline-card.t1 h3 { color: #c62828; }
+  .timeline-card.t2 h3 { color: #ef6c00; }
+  .timeline-card.t3 h3 { color: #2e7d32; }
+  .timeline-card .years {
+    font-family: "Outfit", sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-sub);
+  }
+  .timeline-card .slogan-preview {
+    font-size: 12px;
+    background: rgba(0,0,0,0.04);
+    padding: 4px 8px;
+    border-radius: 20px;
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  /* 分期詳細說明內容 */
+  .period-detail {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+  }
+  .period-detail.active {
+    display: block;
+  }
+  .period-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 24px;
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 12px;
+  }
+  .badge.b-red { background: #e53935; }
+  .badge.b-yellow { background: #ffb300; color: #3e2723; }
+  .badge.b-green { background: #43a047; }
+
+  .detail-section h4 {
+    font-size: 18px;
+    color: var(--primary-dark);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .detail-section p {
+    font-size: 15px;
+    color: #37474f;
+    margin-bottom: 16px;
+    text-align: justify;
+  }
+
+  /* 政策口號對比框 */
+  .slogan-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .camp-card {
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid #cfd8dc;
+  }
+  .camp-card.roc {
+    background: #e3f2fd;
+    border-color: #90caf9;
+  }
+  .camp-card.prc {
+    background: #ffebee;
+    border-color: #ffcdd2;
+  }
+  .camp-card h5 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .camp-card.roc h5 { color: #1565c0; }
+  .camp-card.prc h5 { color: #c62828; }
+  .camp-card .slogan-text {
+    font-size: 16px;
+    font-weight: 900;
+    text-align: center;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  .camp-card.roc .slogan-text { color: #0d47a1; border: 1px solid #bbdefb; }
+  .camp-card.prc .slogan-text { color: #b71c1c; border: 1px solid #ffcdd2; }
+
+  .key-events-list {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 4px solid var(--primary);
+  }
+  .key-events-list li {
+    list-style: none;
+    font-size: 14px;
+    margin-bottom: 8px;
+    padding-left: 14px;
+    position: relative;
+  }
+  .key-events-list li::before {
+    content: '▪';
+    position: absolute;
+    left: 0; color: var(--primary);
+  }
+  .key-events-list b {
+    color: var(--primary-dark);
+  }
+
+  .period-media {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .media-box {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  }
+  .media-box img {
+    max-width: 100%;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto 8px;
+  }
+  .media-box span {
+    font-size: 12px;
+    color: var(--text-sub);
+    display: block;
+    line-height: 1.4;
+  }
+
+  /* ================== 單元三：交流機構與人物 ================== */
+  .agency-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  .agency-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid #e0e0e0;
+  }
+  .agency-card h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .agency-card.roc h3 { color: #1565c0; border-color: #bbdefb; }
+  .agency-card.prc h3 { color: #c62828; border-color: #ffcdd2; }
+  
+  .agency-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .flow-item {
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+  }
+  .flow-item.official {
+    background: #eceff1;
+    border: 2px solid #b0bec5;
+    color: #37474f;
+  }
+  .flow-item.unofficial {
+    background: #e8f5e9;
+    border: 2px solid #81c784;
+    color: #2e7d32;
+  }
+  .flow-item h4 {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  .flow-item p {
+    font-size: 12px;
+  }
+  .flow-arrow {
+    text-align: center;
+    font-size: 16px;
+    color: var(--text-sub);
+    margin: -4px 0;
+  }
+
+  .agency-img-box {
+    text-align: center;
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .agency-img-box img {
+    max-width: 80%;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+  }
+  .agency-img-box span {
+    font-size: 13px;
+    color: var(--text-sub);
+    display: block;
+  }
+
+  /* 歷史人物輪播卡片 */
+  .figures-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  
+  .figure-item {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .figure-item:hover, .figure-item.active {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(0,121,107,0.15);
+  }
+  .figure-item img {
+    width: 70px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #e0e0e0;
+  }
+  .figure-item h4 {
+    font-size: 14px;
+    color: var(--text-main);
+  }
+  .figure-item p {
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+
+  .figure-bio-box {
+    margin-top: 16px;
+    background: var(--primary-light);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    border-left: 6px solid var(--primary);
+    animation: fadeIn 0.4s;
+  }
+  .bio-photo img {
+    width: 90px;
+    height: 115px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .bio-text h3 {
+    color: var(--primary-dark);
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .bio-text .bio-title {
+    font-size: 13px;
+    background: var(--primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .bio-text p {
+    font-size: 14px;
+    color: #37474f;
+    text-align: justify;
+  }
+
+  /* ================== 單元四：趣味互動遊戲 ================== */
+  /* 依序通關進度條 */
+  .challenge-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+  }
+  .challenge-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: #f5f5f5;
+    border: 2px solid #e0e0e0;
+    transition: var(--transition);
+    min-width: 180px;
+  }
+  .challenge-step.unlocked {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .challenge-step.completed {
+    border-color: #43a047;
+    background: #e8f5e9;
+  }
+  .step-badge {
+    width: 32px; height: 32px;
+    background: #bdbdbd;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 15px;
+    font-family: 'Outfit', sans-serif;
+    flex-shrink: 0;
+    transition: var(--transition);
+  }
+  .challenge-step.unlocked .step-badge { background: var(--primary); }
+  .challenge-step.completed .step-badge { background: #43a047; }
+  .step-body { flex: 1; min-width: 0; }
+  .step-title { font-size: 13px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .step-pts { font-size: 11px; color: var(--text-sub); font-family: 'Outfit', sans-serif; }
+  .step-icon { font-size: 22px; flex-shrink: 0; }
+  .progress-connector {
+    font-size: 20px;
+    color: #bdbdbd;
+    flex-shrink: 0;
+    margin: 0 4px;
+    transition: var(--transition);
+  }
+  .progress-connector.done { color: #43a047; }
+
+  .c-game-panel { display: none; animation: fadeIn 0.4s ease-out; }
+  .c-game-panel.active { display: block; }
+
+  /* 通關證書 (內聯卡片) */
+  .cert-card {
+    text-align: center;
+    padding: 40px 30px;
+    background: linear-gradient(135deg, #fffef5 0%, #faf6ed 100%);
+    border: 3px solid #d4a853;
+    position: relative;
+    overflow: hidden;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .cert-card::before {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    border: 2px solid #c9a95c;
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .cert-card::after {
+    content: '';
+    position: absolute;
+    inset: 14px;
+    border: 1px solid #d4a853;
+    border-radius: 10px;
+    pointer-events: none;
+  }
+  .cert-inner { position: relative; z-index: 1; }
+  .cert-title {
+    font-size: 38px;
+    color: #4e342e;
+    margin-bottom: 8px;
+    font-weight: 900;
+  }
+  .cert-subtitle {
+    font-size: 15px;
+    color: #6d4c41;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  .cert-scores {
+    background: white;
+    border-radius: 12px;
+    padding: 16px 24px;
+    max-width: 380px;
+    margin: 0 auto 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    border: 1px solid #efe0c0;
+  }
+  .cert-score-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid #f5ecd7;
+    font-size: 14px;
+  }
+  .cert-score-row:last-of-type { border-bottom: none; }
+  .cert-pts {
+    font-weight: 900;
+    color: var(--primary-dark);
+    font-family: 'Outfit', sans-serif;
+  }
+  .cert-score-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0 0;
+    margin-top: 6px;
+    border-top: 2px solid #d4a853;
+    font-size: 17px;
+    font-weight: 900;
+  }
+  .cert-total-pts {
+    color: var(--accent);
+    font-family: 'Outfit', sans-serif;
+    font-size: 26px;
+  }
+  .cert-date {
+    font-size: 13px;
+    color: #8d6e63;
+    margin-bottom: 16px;
+  }
+
+  /* 評分檢查點彈窗 + 學生資訊彈窗 */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+  }
+  .modal-box {
+    background: white;
+    border-radius: 20px;
+    padding: 32px 28px;
+    max-width: 440px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    animation: popIn 0.35s ease-out;
+  }
+  .modal-box h2 { font-size: 24px; color: var(--primary-dark); margin-bottom: 12px; }
+  .modal-box .result-text { font-size: 15px; color: #455a64; margin-bottom: 20px; line-height: 1.6; }
+  .modal-box .result-score { font-size: 40px; font-weight: 900; color: var(--accent); font-family: 'Outfit', sans-serif; margin: 8px 0 16px; }
+  .modal-box .retry-question { font-size: 15px; color: #546e7a; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .modal-actions .btn { font-size: 14px; padding: 10px 22px; }
+
+  /* Cert popup (wider, gold-bordered) */
+  .cert-popup {
+    max-width: 560px;
+    background: linear-gradient(135deg, #fffef5 0%, #faf6ed 100%);
+    border: 3px solid #d4a853;
+    position: relative;
+  }
+  .cert-popup::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 2px solid #c9a95c;
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .cert-popup::after {
+    content: '';
+    position: absolute;
+    inset: 14px;
+    border: 1px solid #d4a853;
+    border-radius: 10px;
+    pointer-events: none;
+  }
+  .cert-popup h2 { color: #4e342e; font-size: 30px; }
+  .cert-popup .cert-subtitle { font-size: 14px; color: #6d4c41; margin: 6px 0 18px; line-height: 1.6; }
+  .cert-popup .cert-scores {
+    background: white;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    border: 1px solid #efe0c0;
+  }
+  .cert-popup .cert-score-row {
+    display: flex; justify-content: space-between; padding: 6px 0;
+    border-bottom: 1px solid #f5ecd7; font-size: 13px;
+  }
+  .cert-popup .cert-score-row:last-of-type { border-bottom: none; }
+  .cert-popup .cert-pts { font-weight: 900; color: var(--primary-dark); font-family: 'Outfit', sans-serif; }
+  .cert-popup .cert-score-total {
+    display: flex; justify-content: space-between; padding: 8px 0 0; margin-top: 4px;
+    border-top: 2px solid #d4a853; font-size: 16px; font-weight: 900;
+  }
+  .cert-popup .cert-total-pts { color: var(--accent); font-family: 'Outfit', sans-serif; font-size: 24px; }
+  .cert-popup .cert-date { font-size: 12px; color: #8d6e63; margin: 10px 0; }
+
+  /* 拖曳卡片點選狀態 */
+  .drag-card.selected-card {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 14px rgba(255, 111, 0, 0.4) !important;
+    background: var(--accent-light) !important;
+    transform: scale(1.05);
+  }
+
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background: #eceff1;
+    padding: 12px 20px;
+    border-radius: 12px;
+  }
+  .game-score-box {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--primary-dark);
+  }
+  .game-score-box b {
+    color: var(--accent);
+    font-size: 22px;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  /* 遊戲一：時光重組 (拖曳排序) */
+  .timeline-game-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .timeline-drag-pool {
+    background: #f5f7fa;
+    border: 2px dashed #b0bec5;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    min-height: 80px;
+  }
+  .drag-card {
+    background: white;
+    border: 2px solid #cfd8dc;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    transition: var(--transition);
+  }
+  .drag-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  }
+  .drag-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+  }
+  .drag-card.placed {
+    opacity: 0.35;
+    pointer-events: none;
+    background: #cfd8dc;
+  }
+
+  .timeline-slots-container {
+    overflow-x: auto;
+    padding: 10px 0;
+  }
+  .timeline-slots {
+    display: flex;
+    gap: 14px;
+    min-width: 900px;
+    padding: 10px;
+    background: linear-gradient(90deg, transparent 0%, #cfd8dc 20%, #cfd8dc 80%, transparent 100%);
+    background-size: 100% 4px;
+    background-repeat: no-repeat;
+    background-position: center 25px;
+  }
+  .timeline-slot-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .slot-year {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    background: var(--primary);
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .timeline-slot {
+    width: 130px;
+    height: 70px;
+    border: 2px dashed #b0bec5;
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-sub);
+    padding: 6px;
+    transition: var(--transition);
+  }
+  .timeline-slot.drag-over {
+    background: #fff9c4;
+    border-color: #fbc02d;
+    transform: scale(1.05);
+  }
+  .timeline-slot.filled {
+    border-style: solid;
+    border-color: #81c784;
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-weight: bold;
+    font-size: 13px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  }
+  .timeline-slot.wrong {
+    border-style: solid;
+    border-color: #e57373;
+    background: #ffebee;
+    color: #c62828;
+    animation: shake 0.4s;
+  }
+
+  /* 遊戲二：口號政策對對碰 (分類遊戲) */
+  .slogan-game-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 20px;
+  }
+  .slogan-drag-pool {
+    background: #f5f7fa;
+    border: 2px dashed #cfd8dc;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .slogan-drag-pool .drag-card {
+    text-align: center;
+    font-size: 13px;
+  }
+  
+  .slogan-bins {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .slogan-bin {
+    border-radius: 16px;
+    padding: 16px;
+    min-height: 350px;
+    border: 3px dashed #b0bec5;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: var(--transition);
+  }
+  .slogan-bin h3 {
+    font-size: 16px;
+    text-align: center;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f0f0f0;
+    margin-bottom: 8px;
+  }
+  .slogan-bin.b1 { border-color: #e53935; }
+  .slogan-bin.b1 h3 { color: #c62828; }
+  .slogan-bin.b2 { border-color: #ffb300; }
+  .slogan-bin.b2 h3 { color: #ef6c00; }
+  .slogan-bin.b3 { border-color: #43a047; }
+  .slogan-bin.b3 h3 { color: #2e7d32; }
+
+  .slogan-bin.drag-over {
+    background: #fff9c4;
+    transform: scale(1.02);
+  }
+  .slogan-bin .bin-card {
+    background: #f1f8e9;
+    border: 1px solid #c5e1a5;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    color: #33691e;
+    animation: popIn 0.3s;
+  }
+  .slogan-bin.b1 .bin-card { background: #ffebee; border-color: #ffcdd2; color: #b71c1c; }
+  .slogan-bin.b2 .bin-card { background: #fffde7; border-color: #fff9c4; color: #f57f17; }
+  .slogan-bin.b3 .bin-card { background: #e8f5e9; border-color: #c8e6c9; color: #1b5e20; }
+
+  /* 遊戲三：人物與機構大配對 (記憶翻牌) */
+  .flip-game-container {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .flip-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    perspective: 1000px;
+  }
+  .flip-card {
+    height: 130px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+  .flip-card.flipped {
+    transform: rotateY(180deg);
+  }
+  .flip-card.matched {
+    transform: rotateY(180deg);
+    pointer-events: none;
+  }
+  
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+  }
+  .card-back {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    font-size: 28px;
+    border: 2px solid white;
+  }
+  .card-front {
+    background: white;
+    color: var(--text-main);
+    transform: rotateY(180deg);
+    border: 2px solid var(--primary);
+  }
+  .flip-card.matched .card-front {
+    border-color: #81c784;
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+  .card-front img {
+    width: 70px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 4px;
+  }
+  .card-front .flex-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  /* 提示反饋動畫與工具按鈕 */
+  .controls-bar {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 121, 107, 0.2);
+  }
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 121, 107, 0.3);
+  }
+  .btn-secondary {
+    background: #cfd8dc;
+    color: var(--text-main);
+  }
+  .btn-secondary:hover {
+    background: #b0bec5;
+    transform: translateY(-2px);
+  }
+  
+  .game-message {
+    text-align: center;
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 16px;
+    font-weight: bold;
+    display: none;
+    animation: popIn 0.3s;
+  }
+  .game-message.success { background: #e8f5e9; color: #2e7d32; display: block; }
+  .game-message.error { background: #ffebee; color: #c62828; display: block; }
+
+  @keyframes popIn {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+
+  /* ================== 單元五：最後大整理 ================== */
+  .summary-table-wrapper {
+    overflow-x: auto;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid #e0e0e0;
+    background: white;
+  }
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+  }
+  .summary-table th, .summary-table td {
+    padding: 16px;
+    border-bottom: 1px solid #eceff1;
+  }
+  .summary-table th {
+    background: var(--primary-dark);
+    color: white;
+    font-weight: 700;
+  }
+  .summary-table tr:hover {
+    background: #f5f7fa;
+  }
+  .summary-table td.col-period {
+    font-weight: 900;
+  }
+  .summary-table tr:nth-child(1) td.col-period { color: #c62828; }
+  .summary-table tr:nth-child(2) td.col-period { color: #ef6c00; }
+  .summary-table tr:nth-child(3) td.col-period { color: #2e7d32; }
+
+  /* 匯出列印樣式優化 */
+  @media print {
+    body {
+      background: white;
+      color: black;
+      padding: 0;
+    }
+    header, .tabs, .assistant-bar, .controls-bar, .game-selection, .game-header, .timeline-nav, .figures-grid, .figure-bio-box {
+      display: none !important;
+    }
+    .tab-content {
+      display: none !important;
+    }
+    .tab-content#summaryTab {
+      display: block !important;
+    }
+    .card {
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+    .summary-table th {
+      background: #333 !important;
+      color: white !important;
+    }
+    .summary-table td, .summary-table th {
+      border: 1px solid #ccc !important;
+    }
+  }
+
+  /* 畫布特效元件 (Confetti) */
+  #canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* 響應式佈局適配 */
+  @media (max-width: 900px) {
+    .intro-grid, .period-layout, .agency-layout, .slogan-game-layout {
+      grid-template-columns: 1fr;
+    }
+    .figures-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .slogan-bins {
+      grid-template-columns: 1fr;
+    }
+    header {
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="container">
+  <!-- 頁首與 Tab 選單 -->
+  <header>
+    <div class="header-title">
+      <h1>🇹🇼 5-2 臺海兩岸關係的演變 🇨🇳</h1>
+      <p>國中歷史 1 下 L05 戰後臺灣的外交與兩岸關係 課堂 CAI 互動輔助教材</p>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="introTab">🏠 課程首頁</button>
+      <button class="tab-btn" data-tab="timelineTab">⏳ 歷史分期</button>
+      <button class="tab-btn" data-tab="agencyTab">🏛️ 機構與人物</button>
+      <button class="tab-btn" data-tab="summaryTab">📊 重點大整理</button>
+      <button class="tab-btn" data-tab="gameTab">🎮 互動挑戰</button>
+    </div>
+  </header>
+
+  <!-- 黑熊小助手提示列 -->
+  <div class="assistant-bar">
+    <div class="assistant-avatar">🐻</div>
+    <div class="assistant-text">
+      <h4 id="assistantTitle">黑熊小助手提示</h4>
+      <p id="assistantDesc">歡迎來到臺海兩岸關係學習網頁！請點擊上方選單開始學習！平板使用者可直接用手指拖曳及點擊喔！</p>
+    </div>
+  </div>
+
+  <!-- ================== 頁面一：課程首頁 ================== -->
+  <div id="introTab" class="tab-content active">
+    <div class="card">
+      <div class="intro-grid">
+        <div class="intro-text">
+          <h2>探討兩岸政權的半世紀演變</h2>
+          <p>
+            自民國 38 年（西元 1949 年）中華民國政府遷臺後，海峽兩岸形成分裂分治的局面。兩岸關係隨著國際局勢與雙方政策的轉變，從早期的軍事對抗，走向後來的政治對峙，再到近年來的經貿與文化交流。
+          </p>
+          <p>
+            本網頁將帶領你透過互動時間軸、探討兩岸半官方式的談判窗口（陸委會、海基會等），並進行好玩的時光排序與口號配對遊戲。讓我們一起了解這段深深影響臺灣人民生活與國際外交的重要歷史吧！
+          </p>
+          <div class="goals-list">
+            <h3>📖 本課學習重點</h3>
+            <ul>
+              <li>了解兩岸關係發展的三個歷史分期與特徵。</li>
+              <li>理解各時期的兩岸宣傳標語、外交政策與口號的關聯。</li>
+              <li>認識海基會與海協會等中介交流機構的定位與重要會談。</li>
+              <li>能將戰後臺灣的重要歷史事件與領導人物進行時間排序。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="intro-img-container">
+          <img src="images/l05_clean/map_kinmen_matsu.jpg" alt="兩岸對峙地圖">
+          <span>戰後兩岸對抗時期的前線金門與馬祖地理位置圖</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== 頁面二：歷史分期 ================== -->
+  <div id="timelineTab" class="tab-content">
+    <!-- 分期卡片選單 -->
+    <div class="timeline-nav">
+      <div class="timeline-card t1 active" data-period="p1">
+        <h3>🔴 武力對抗時期</h3>
+        <div class="years">民國 38～68 年</div>
+        <div class="slogan-preview">「光復大陸」/「解放臺灣」</div>
+      </div>
+      <div class="timeline-card t2" data-period="p2">
+        <h3>🟡 政治對峙時期</h3>
+        <div class="years">民國 68～76 年</div>
+        <div class="slogan-preview">「三民主義統一中國」/「一國兩制」</div>
+      </div>
+      <div class="timeline-card t3" data-period="p3">
+        <h3>🟢 兩岸交流時期</h3>
+        <div class="years">民國 76 年～現今</div>
+        <div class="slogan-preview">解嚴、小三通、大三通</div>
+      </div>
+    </div>
+
+    <!-- 詳細期別內容 -->
+    <!-- 時期一 -->
+    <div id="p1" class="card period-detail active">
+      <span class="badge b-red">武力對抗時期 (民國38~68年)</span>
+      <div class="period-layout">
+        <div class="detail-section">
+          <h4>💥 軍事衝突與反共宣導</h4>
+          <p>
+            民國38年，中華民國政府遷臺，兩岸陷入長期分裂分治。初期中共揚言以武力解放臺灣，並進犯金門。在<b>古寧頭戰役</b>中，國軍奮勇擊退共軍，守住臺灣防線。民國47年爆發<b>八二三砲戰</b>，共軍猛烈砲轟金門，國軍力守金馬前線，此後轉為零星衝突，兩岸未再發生大規模武力對抗。
+          </p>
+          <h4>📢 雙方口號與宣傳</h4>
+          <div class="slogan-box">
+            <div class="camp-card roc">
+              <h5>🇹🇼 中華民國（臺灣）政策口號</h5>
+              <div class="slogan-text">「光復大陸」/「反攻大陸」</div>
+              <p style="font-size: 12px; margin-top: 8px; color: #1565c0;">社會標語常見「消滅朱毛，驅逐俄寇」。</p>
+            </div>
+            <div class="camp-card prc">
+              <h5>🇨🇳 中華人民共和國政策口號</h5>
+              <div class="slogan-text">「武力解放臺灣」</div>
+              <p style="font-size: 12px; margin-top: 8px; color: #c62828;">強調一黨專政並以武力手段完成統一。</p>
+            </div>
+          </div>
+          <div class="key-events-list">
+            <b>🔑 關鍵事件：</b>
+            <ul>
+              <li><b>民國38年：</b>古寧頭戰役（金門防衛戰獲勝）</li>
+              <li><b>民國39年：</b>韓戰爆發，美軍第七艦隊協防臺海，美援開始</li>
+              <li><b>民國43年：</b>簽訂《中美共同防禦條約》</li>
+              <li><b>民國47年：</b>八二三砲戰（共軍猛烈轟擊金門）</li>
+            </ul>
+          </div>
+        </div>
+        <div class="period-media">
+          <div class="media-box">
+            <img src="images/l05_clean/propaganda_no_sun.jpg" alt="沒有太陽的地方">
+            <span>課本插圖：早期的政治宣傳，雙方均宣傳對方人民身處水深火熱之中</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 時期二 -->
+    <div id="p2" class="card period-detail">
+      <span class="badge b-yellow">政治對峙時期 (民國68~76年)</span>
+      <div class="period-layout">
+        <div class="detail-section">
+          <h4>🕊️ 和平統戰與三不政策對立</h4>
+          <p>
+            民國68年，美國與中華人民共和國建交並與中華民國斷交。此後中共對臺政策轉變，改採<b>「和平統戰」</b>，並提出<b>「一國兩制」</b>（即在一個中國原則下，臺灣享有高度自治，但否定中華民國主權，我方不予接受）。
+          </p>
+          <p>
+            面對中共的統戰策略，中華民國政府採取堅定的防守政策，宣示<b>「三民主義統一中國」</b>，並宣布堅守<b>「不接觸、不談判、不妥協」</b>的<b>「三不政策」</b>。兩岸雖無大規模軍事衝突，但政治立場極度對立，彼此互不往來。
+          </p>
+          <div class="slogan-box">
+            <div class="camp-card roc">
+              <h5>🇹🇼 中華民國（臺灣）政策口號</h5>
+              <div class="slogan-text">「三不政策」</div>
+              <p style="font-size: 12px; margin-top: 8px; color: #1565c0;">堅持三民主義統一中國，拒絕中共統戰。</p>
+            </div>
+            <div class="camp-card prc">
+              <h5>🇨🇳 中華人民共和國政策口號</h5>
+              <div class="slogan-text">「一國兩制」</div>
+              <p style="font-size: 12px; margin-top: 8px; color: #c62828;">改採和平宣傳戰，推動一國兩制統一。</p>
+            </div>
+          </div>
+          <div class="key-events-list">
+            <b>🔑 關鍵事件：</b>
+            <ul>
+              <li><b>民國68年：</b>美國與中共建交、與我國斷交，制定《臺灣關係法》維持非官方往來</li>
+              <li><b>民國70年代：</b>兩岸展開和平政治宣傳，金門馬祖心戰廣播、空飄氣球戰</li>
+            </ul>
+          </div>
+        </div>
+        <div class="period-media">
+          <div class="media-box">
+            <img src="images/l05_clean/golden_horse_award.jpg" alt="金馬獎">
+            <span>課本插圖：「金馬獎」典故由來，命名旨在鼓勵電影界效法金門馬祖國軍的防衛精神</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 時期三 -->
+    <div id="p3" class="card period-detail">
+      <span class="badge b-green">兩岸交流時期 (民國76年~現今)</span>
+      <div class="period-layout">
+        <div class="detail-section">
+          <h4>🤝 開放探親與制度化協商</h4>
+          <p>
+            民國76年，蔣經國總統宣布<b>解除戒嚴</b>，並開放民眾赴中國大陸探親，兩岸正式打破隔閡。因涉兩岸公權力，政府於民國80年成立<b>大陸委員會（陸委會）</b>主管兩岸政策，並成立民間性質的<b>海峽交流基金會（海基會）</b>處理涉臺商、糾紛等具體事務。中共方面隨後成立<b>海峽兩岸關係協會（海協會）</b>作為對口。
+          </p>
+          <p>
+            民國82年，海基會董事長<b>辜振甫</b>與海協會會長<b>汪道涵</b>在新加坡舉行歷史性的<b>辜汪會談</b>，這是兩岸分裂分治後的第一次正式官方授權接觸。隨後兩岸陸續實施「小三通」（民國90年）與「大三通」（民國97年），通郵、通航、通商全方位展開。
+          </p>
+          <div class="key-events-list">
+            <b>🔑 關鍵事件：</b>
+            <ul>
+              <li><b>民國76年：</b>解除戒嚴，開放赴大陸探親</li>
+              <li><b>民國80年：</b>政府設立「陸委會」，並成立「海基會」；中共設立「海協會」</li>
+              <li><b>民國82年：</b>辜汪會談（新加坡）</li>
+              <li><b>民國90年起：</b>小三通（金、馬、澎與福建局部通航、通郵、通商）</li>
+              <li><b>民國97年：</b>全面大三通（兩岸直航）</li>
+            </ul>
+          </div>
+        </div>
+        <div class="period-media">
+          <div class="media-box" style="margin-bottom:12px;">
+            <img src="images/l05_clean/koo_wang_meeting.jpg" alt="辜汪會談">
+            <span>課本照片：民國82年，辜振甫（左）與汪道涵（右）於新加坡握手會談</span>
+          </div>
+          <div class="media-box">
+            <img src="images/l05_clean/three_links.jpg" alt="三通關係">
+            <span>課本插圖：大三通的實施讓兩岸的客貨航機、郵件等能夠直接通聯</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== 頁面三：機構與人物 ================== -->
+  <div id="agencyTab" class="tab-content">
+    <div class="card">
+      <h2 style="font-size:22px; color:var(--primary-dark); margin-bottom:16px;">🏛️ 兩岸交流機構對照</h2>
+      <p style="font-size:15px; color:#546e7a; margin-bottom:20px;">
+        兩岸政治局勢特殊，為處理繁雜的民間交流事務，雙方政府各自成立了「官方主管單位」與「半官方的受託民間團體」：
+      </p>
+      
+      <div class="agency-layout">
+        <div class="agency-card roc">
+          <h3>🇹🇼 中華民國 (臺灣)</h3>
+          <div class="agency-flow">
+            <div class="flow-item official">
+              <h4>行政院 大陸委員會 (陸委會)</h4>
+              <p>官方主管單位，負責研擬與規劃兩岸政策</p>
+            </div>
+            <div class="flow-arrow">⬇️ 委託協商與服務</div>
+            <div class="flow-item unofficial">
+              <h4>財團法人 海峽交流基金會 (海基會)</h4>
+              <p>官方授權的民間團體，兩岸交流的第一線談判與服務窗口</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="agency-card prc">
+          <h3>🇨🇳 中華人民共和國 (中國大陸)</h3>
+          <div class="agency-flow">
+            <div class="flow-item official">
+              <h4>國務院 臺灣事務辦公室 (國臺辦)</h4>
+              <p>官方主管單位，負責對臺工作方針與政策</p>
+            </div>
+            <div class="flow-arrow">⬇️ 委託協商與服務</div>
+            <div class="flow-item unofficial">
+              <h4>海峽兩岸關係協會 (海協會)</h4>
+              <p>官方授權的民間團體，與海基會對口協商之窗口</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="agency-img-box">
+        <img src="images/l05_clean/agency_flowchart.jpg" alt="兩岸機構交流對照流程">
+        <span>課本插圖：兩岸事務交流的政策溝通與委託民間協商對口機制</span>
+      </div>
+    </div>
+
+    <!-- 重要人物介紹 -->
+    <div class="card">
+      <h2 style="font-size:22px; color:var(--primary-dark); margin-bottom:12px;">👤 兩岸關係重要歷史人物</h2>
+      <p style="font-size:14px; color:var(--text-sub);">點擊下方的人物，觀看他在兩岸演變中扮演的角色與生平事蹟：</p>
+      
+      <div class="figures-grid">
+        <div class="figure-item active" data-bio="c1">
+          <img src="images/l05_clean/president_chiang_kai_shek.jpg" alt="蔣中正">
+          <h4>蔣中正</h4>
+          <p>第 1～5 任總統</p>
+        </div>
+        <div class="figure-item" data-bio="c2">
+          <img src="images/l05_clean/president_chiang_ching_kuo.jpg" alt="蔣經國">
+          <h4>蔣經國</h4>
+          <p>第 6～7 任總統</p>
+        </div>
+        <div class="figure-item" data-bio="c3">
+          <img src="images/l05_clean/president_lee_teng_hui.jpg" alt="李登輝">
+          <h4>李登輝</h4>
+          <p>第 8～9 任總統</p>
+        </div>
+        <div class="figure-item" data-bio="c4">
+          <img src="images/l05_clean/koo_wang_meeting.jpg" alt="辜振甫">
+          <h4>辜振甫</h4>
+          <p>海基會首任董事長</p>
+        </div>
+        <div class="figure-item" data-bio="c5">
+          <img src="images/l05_clean/koo_wang_meeting.jpg" alt="汪道涵">
+          <h4>汪道涵</h4>
+          <p>海協會首任會長</p>
+        </div>
+      </div>
+
+      <!-- 人物詳細生平 -->
+      <div id="bioDisplay" class="figure-bio-box">
+        <div class="bio-photo">
+          <img id="bioImg" src="images/l05_clean/president_chiang_kai_shek.jpg" alt="人物照片">
+        </div>
+        <div class="bio-text">
+          <h3 id="bioName">蔣中正</h3>
+          <span id="bioTitle" class="bio-title">總統任期：民國 37～64 年</span>
+          <p id="bioDesc">國共內戰失敗後，帶領中華民國政府遷臺。面對兩岸分裂，他在臺灣實行戒嚴，軍事上堅持「反攻大陸」、「光復大陸」，宣傳「消滅朱毛，驅逐俄寇」。在美援支持下穩定臺灣安全，是武力對抗时期的核心領導者。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== 頁面四：重點大整理 ================== -->
+  <div id="summaryTab" class="tab-content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="font-size:22px; color:var(--primary-dark);">📊 臺海兩岸關係歷史分期大整理</h2>
+        <button class="btn btn-primary" onclick="window.print()">🖨️ 列印/儲存為學習單</button>
+      </div>
+
+      <div class="summary-table-wrapper">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th style="width:15%;">歷史分期</th>
+              <th style="width:15%;">時間</th>
+              <th style="width:20%;">關係特徵與政策</th>
+              <th style="width:20%;">代表性口號標語</th>
+              <th style="width:30%;">此時期重要大事與人物</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-period">🔴 武力對抗</td>
+              <td>民國 38～68 年<br>(1949～1979)</td>
+              <td>
+                • 軍事衝突為主，分裂分治<br>
+                • 臺灣推動<b>鞏固外交</b><br>
+                • 美國第七艦隊協防、美援支持
+              </td>
+              <td>
+                • 臺灣：<b>「光復大陸」</b>、<b>「消滅朱毛，驅逐俄寇」</b><br>
+                • 中共：<b>「武力解放臺灣」</b>
+              </td>
+              <td>
+                • <b>古寧頭戰役</b>（國軍獲勝守住臺灣）<br>
+                • <b>八二三砲戰</b>（國防守衛戰力挺前線）<br>
+                • 重要人物：<b>蔣中正</b>（堅守反共立場）
+              </td>
+            </tr>
+            <tr>
+              <td class="col-period">🟡 政治對峙</td>
+              <td>民國 68～76 年<br>(1979～1987)</td>
+              <td>
+                • 衝突趨緩，改採和平宣傳戰，互不往來<br>
+                • 臺灣推動<b>彈性外交</b><br>
+                • 中共改為<b>「和平統戰」</b>
+              </td>
+              <td>
+                • 臺灣：<b>「三民主義統一中國」</b>、<b>「三不政策」</b>（不接觸、不談判、不妥協）<br>
+                • 中共：<b>「一國兩制」</b>
+              </td>
+              <td>
+                • 美國與中共建交、與我斷交，制定《臺灣關係法》維持非官方往來<br>
+                • 重要人物：<b>蔣經國</b>（面對中共和平統戰宣示三不政策）
+              </td>
+            </tr>
+            <tr>
+              <td class="col-period">🟢 兩岸交流</td>
+              <td>民國 76 年～現今<br>(1987～現今)</td>
+              <td>
+                • 經貿、文化、社會全面交流<br>
+                • 臺灣推動<b>務實外交</b>，承認兩岸分裂分治實務<br>
+                • 成立中介交流窗口協商
+              </td>
+              <td>
+                • 臺灣：開放探親、開展大小三通<br>
+                • 中共：爭取和平統一，但不承諾放棄使用武力
+              </td>
+              <td>
+                • 民國76年<b>解除戒嚴</b>，開放探親<br>
+                • 設立官方<b>陸委會/國臺辦</b>與民間授權對口<b>海基會/海協會</b><br>
+                • 民國82年舉辦第一次<b>辜汪會談</b>（新加坡）<br>
+                • 民國90年<b>小三通</b> ➡ 民國97年全面<b>大三通</b><br>
+                • 重要人物：<b>李登輝</b>、<b>辜振甫</b>、<b>汪道涵</b>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== 頁面五：互動挑戰 (依序通關) ================== -->
+  <div id="gameTab" class="tab-content">
+    <!-- 學生資訊輸入彈窗 -->
+    <div id="studentModal" class="modal-overlay" style="display:none;">
+      <div class="modal-box">
+        <h2>📝 請先填寫基本資料</h2>
+        <p class="result-text">為了記錄你的通關成績，請依序填寫年級、班別、座號與姓名</p>
+        <div style="display:flex; flex-direction:column; gap:10px; max-width:320px; margin:0 auto 20px;">
+          <div style="display:flex; gap:10px;">
+            <input type="number" id="studentGrade" placeholder="年級" min="1" max="9" style="flex:1; padding:10px 14px; border:2px solid #cfd8dc; border-radius:10px; font-size:15px; font-family:inherit;">
+            <input type="number" id="studentClass" placeholder="班" min="1" max="30" style="flex:1; padding:10px 14px; border:2px solid #cfd8dc; border-radius:10px; font-size:15px; font-family:inherit;">
+            <input type="number" id="studentSeat" placeholder="座號" min="1" max="50" style="flex:1; padding:10px 14px; border:2px solid #cfd8dc; border-radius:10px; font-size:15px; font-family:inherit;">
+          </div>
+          <input type="text" id="studentName" placeholder="姓名" style="padding:10px 14px; border:2px solid #cfd8dc; border-radius:10px; font-size:15px; font-family:inherit;">
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="studentStartBtn">✓ 開始挑戰</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通關進度指示器 -->
+    <div class="challenge-progress">
+      <div class="challenge-step unlocked" id="cStep1">
+        <div class="step-badge">1</div>
+        <div class="step-body">
+          <div class="step-title">📅 時光重組</div>
+          <div class="step-pts">32 分</div>
+        </div>
+        <div class="step-icon" id="cIcon1">🔓</div>
+      </div>
+      <div class="progress-connector" id="cConn1">▶</div>
+      <div class="challenge-step" id="cStep2">
+        <div class="step-badge">2</div>
+        <div class="step-body">
+          <div class="step-title">💬 政策口號配對</div>
+          <div class="step-pts">28 分</div>
+        </div>
+        <div class="step-icon" id="cIcon2">🔒</div>
+      </div>
+      <div class="progress-connector" id="cConn2">▶</div>
+      <div class="challenge-step" id="cStep3">
+        <div class="step-badge">3</div>
+        <div class="step-body">
+          <div class="step-title">🃏 人物機構翻翻樂</div>
+          <div class="step-pts">40 分</div>
+        </div>
+        <div class="step-icon" id="cIcon3">🔒</div>
+      </div>
+    </div>
+
+    <!-- 挑戰一：時光重組 (拖曳排序) -->
+    <div id="cGame1" class="card c-game-panel active">
+      <div class="game-header">
+        <div>
+          <h3>📅 挑戰一：時光重組（32 分）</h3>
+          <p style="font-size:13px; color:var(--text-sub); margin-top:4px;">請將下方的歷史事件卡片，拖曳（或點選配對）到上方正確的年代空格中！每題 4 分，錯一個扣 5 分。</p>
+        </div>
+        <div class="game-score-box">得分：<b id="g1Score">0</b> / 32</div>
+      </div>
+
+      <div class="timeline-game-layout">
+        <div class="timeline-slots-container">
+          <div class="timeline-slots" id="tSlots"></div>
+        </div>
+        <div class="timeline-drag-pool" id="tPool"></div>
+        <div class="controls-bar">
+          <button class="btn btn-secondary" onclick="resetGame1()">🔄 重置遊戲</button>
+          <button class="btn btn-primary" onclick="checkGame1()">✓ 提交答案</button>
+        </div>
+        <div id="g1Msg" class="game-message"></div>
+      </div>
+    </div>
+
+    <!-- 挑戰二：政策口號對對碰 -->
+    <div id="cGame2" class="card c-game-panel">
+      <div class="game-header">
+        <div>
+          <h3>💬 挑戰二：政策口號分類配對（28 分）</h3>
+          <p style="font-size:13px; color:var(--text-sub); margin-top:4px;">拖曳（或點選配對）左邊的標語晶片，投入右邊正確的歷史分期盒中！每題 4 分，錯一個扣 5 分。</p>
+        </div>
+        <div class="game-score-box">得分：<b id="g2Score">0</b> / 28</div>
+      </div>
+
+      <div class="slogan-game-layout">
+        <div class="slogan-drag-pool" id="sPool"></div>
+        <div class="slogan-bins">
+          <div class="slogan-bin b1" data-cat="military">
+            <h3>🔴 武力對抗期</h3>
+          </div>
+          <div class="slogan-bin b2" data-cat="confront">
+            <h3>🟡 政治對峙期</h3>
+          </div>
+          <div class="slogan-bin b3" data-cat="exchange">
+            <h3>🟢 兩岸交流期</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <button class="btn btn-secondary" onclick="resetGame2()">🔄 重置遊戲</button>
+        <button class="btn btn-primary" onclick="checkGame2()">✓ 提交答案</button>
+      </div>
+      <div id="g2Msg" class="game-message"></div>
+    </div>
+
+    <!-- 挑戰三：人物與機構記憶翻牌 -->
+    <div id="cGame3" class="card c-game-panel">
+      <div class="game-header">
+        <div>
+          <h3>🃏 挑戰三：人物與機構記憶翻牌（40 分）</h3>
+          <p style="font-size:13px; color:var(--text-sub); margin-top:4px;">點擊卡片翻開，找出「人物/機構照片」與「正確生平/職能說明」的配對！每配對成功一組 10 分。</p>
+        </div>
+        <div class="game-score-box">已配對：<b id="g3Score">0</b> / 4 對</div>
+      </div>
+
+      <div class="flip-game-container">
+        <div class="flip-grid" id="flipGrid"></div>
+      </div>
+
+      <div class="controls-bar">
+        <button class="btn btn-secondary" onclick="resetGame3()">🔄 重新開始</button>
+      </div>
+      <div id="g3Msg" class="game-message"></div>
+    </div>
+
+    <!-- 通關證書（內聯） -->
+    <div id="certificate" class="card cert-card" style="display:none;">
+      <div class="cert-inner">
+        <h1 class="cert-title">🏆 通關證書</h1>
+        <p class="cert-subtitle">恭喜你完成「臺海兩岸關係的演變」三大互動挑戰！<br>你已掌握戰後兩岸關係的三個歷史分期、政策口號、中介機構與重要人物。</p>
+        <div class="cert-scores">
+          <div class="cert-score-row">
+            <span>📅 挑戰一：時光重組</span>
+            <span class="cert-pts" id="certPts1">—</span>
+          </div>
+          <div class="cert-score-row">
+            <span>💬 挑戰二：政策口號配對</span>
+            <span class="cert-pts" id="certPts2">—</span>
+          </div>
+          <div class="cert-score-row">
+            <span>🃏 挑戰三：人物機構翻翻樂</span>
+            <span class="cert-pts" id="certPts3">—</span>
+          </div>
+          <div class="cert-score-total">
+            <span>總分</span>
+            <span class="cert-total-pts" id="certTotal">—</span>
+          </div>
+        </div>
+        <p class="cert-date" id="certDate"></p>
+        <button class="btn btn-primary" onclick="resetAllChallenges()">🔄 重新挑戰</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== Firebase 初始化 ======
+const firebaseConfig = {
+  apiKey: "AIzaSyBnIkk08DpjkkQDeSOusaM8GWqAqmDqqGA",
+  authDomain: "tscpsystem.firebaseapp.com",
+  databaseURL: "https://tscpsystem-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "tscpsystem",
+  storageBucket: "tscpsystem.firebasestorage.app",
+  messagingSenderId: "246550546781",
+  appId: "1:246550546781:web:d26a020eb05f3a25fa40b4",
+  measurementId: "G-18HH2Q1CY6"
+};
+let db = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+} catch (e) {
+  console.warn('Firebase 初始化失敗：', e);
+}
+
+const CHAPTER_CODE = 'L05';
+const CHAPTER_TITLE = '臺海兩岸關係的演變';
+
+function getStudentInfo() {
+  try {
+    return JSON.parse(localStorage.getItem('l05_student_info') || 'null');
+  } catch (e) { return null; }
+}
+function saveStudentInfo(classId, name) {
+  localStorage.setItem('l05_student_info', JSON.stringify({ classId, name }));
+}
+function showStudentModalIfNeeded() {
+  const info = getStudentInfo();
+  if (info && info.classId && info.name) return true;
+  const modal = document.getElementById('studentModal');
+  if (modal) modal.style.display = '';
+  return false;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const startBtn = document.getElementById('studentStartBtn');
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      const grade = (document.getElementById('studentGrade').value || '').trim();
+      const cls   = (document.getElementById('studentClass').value || '').trim();
+      const seat  = (document.getElementById('studentSeat').value || '').trim();
+      const name  = (document.getElementById('studentName').value || '').trim();
+      if (!grade || !cls || !seat || !name) {
+        alert('請完整填寫年級、班、座號與姓名');
+        return;
+      }
+      const classId = `${grade}${cls}-${seat}`;
+      saveStudentInfo(classId, name);
+      const modal = document.getElementById('studentModal');
+      if (modal) modal.style.display = 'none';
+    });
+  }
+});
+
+// 音效合成器 (Web Audio API)
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(type) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  if (type === 'correct') {
+    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.45);
+  } else if (type === 'wrong') {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(220.00, audioCtx.currentTime); // A3
+    osc.frequency.setValueAtTime(147.00, audioCtx.currentTime + 0.15); // D3
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.4);
+  } else if (type === 'flip') {
+    osc.frequency.setValueAtTime(440.00, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+  }
+}
+
+// 繽紛糖果彩帶特效 (Canvas Confetti)
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let animFrame;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function createConfetti() {
+  particles = [];
+  const colors = ['#e53935', '#ffb300', '#43a047', '#1e88e5', '#8e24aa', '#ff7043'];
+  for (let i = 0; i < 150; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 100,
+      r: 4 + Math.random() * 8,
+      d: Math.random() * canvas.height,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      tilt: Math.random() * 10 - 5,
+      tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+      tiltAngle: 0
+    });
+  }
+  if (animFrame) cancelAnimationFrame(animFrame);
+  drawConfetti();
+}
+
+function drawConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let active = false;
+  particles.forEach(p => {
+    p.tiltAngle += p.tiltAngleIncremental;
+    p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+    p.x += Math.sin(p.tiltAngle);
+    p.tilt = Math.sin(p.tiltAngle - p.r / 2) * 5;
+
+    ctx.beginPath();
+    ctx.lineWidth = p.r;
+    ctx.strokeStyle = p.color;
+    ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+    ctx.stroke();
+
+    if (p.y < canvas.height) {
+      active = true;
+    }
+  });
+  if (active) {
+    animFrame = requestAnimationFrame(drawConfetti);
+  } else {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+// Tab 切換控制
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+    btn.classList.add('active');
+    const tabId = btn.dataset.tab;
+    const activeTab = document.getElementById(tabId);
+    activeTab.classList.add('active');
+
+    // 小助手提示內容更新
+    updateAssistant(tabId);
+    // 進入互動挑戰時若無學生資料，彈出輸入視窗
+    if (tabId === 'gameTab') {
+      showStudentModalIfNeeded();
+    }
+  });
+});
+
+function updateAssistant(tabId) {
+  const title = document.getElementById('assistantTitle');
+  const desc = document.getElementById('assistantDesc');
+  
+  if (tabId === 'introTab') {
+    title.textContent = '黑熊小助手提示';
+    desc.textContent = '歡迎來到兩岸關係學習網頁！請點擊上方選單開始學習！平板使用者可直接用手指拖曳及點擊喔！';
+  } else if (tabId === 'timelineTab') {
+    title.textContent = '⏳ 分期時間軸學習中';
+    desc.textContent = '請點選紅、黃、綠三張不同的分期卡片，詳細閱讀每個時期的歷史事件與外交兩岸關係政策！';
+  } else if (tabId === 'agencyTab') {
+    title.textContent = '🏛️ 機構與人物學習中';
+    desc.textContent = '注意對照「官方」和「民間」組織。下方重要歷史人物點選後可查看總統們的重大施政喔！';
+  } else if (tabId === 'summaryTab') {
+    title.textContent = '📊 重點大整理與匯出';
+    desc.textContent = '這是本課的三大歷史分期精華對照表。你可以點選「列印/儲存為學習單」下載列印成實體考前衝刺大補帖！';
+  } else if (tabId === 'gameTab') {
+    title.textContent = '🎮 互動挑戰';
+    desc.textContent = '三關依序登場：時光重組(32分) → 政策口號配對(28分) → 翻牌配對(40分)，通關後獲得證書並上傳成績！';
+  }
+}
+
+// ================== 單元二：歷史分期切換 ==================
+document.querySelectorAll('.timeline-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.timeline-card').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.period-detail').forEach(d => d.classList.remove('active'));
+    
+    card.classList.add('active');
+    const periodId = card.dataset.period;
+    document.getElementById(periodId).classList.add('active');
+  });
+});
+
+// ================== 單元三：歷史人物生平切換 ==================
+const BIOS = {
+  c1: {
+    name: '蔣中正',
+    title: '總統任期：民國 37～64 年',
+    desc: '國共內戰失敗後，帶領中華民國政府遷臺。面對兩岸分裂，他在臺灣實行戒嚴，軍事上堅持「反攻大陸」、「光復大陸」，宣傳「消滅朱毛，驅逐俄寇」。在美援支持下穩定臺灣安全，是武力對抗時期的核心領導者。',
+    img: 'images/l05_clean/president_chiang_kai_shek.jpg'
+  },
+  c2: {
+    name: '蔣經國',
+    title: '總統任期：民國 67～77 年',
+    desc: '任內帶領臺灣推動十大建設，並歷經外交風雨（退出聯合國與臺美斷交）。面對中共「和平統戰」，他宣示「三不政策」（不接觸、不談判、不妥協）。晚年順應民意，於民國76年宣布解嚴並開放赴大陸探親，揭開了兩岸交流的序幕。',
+    img: 'images/l05_clean/president_chiang_ching_kuo.jpg'
+  },
+  c3: {
+    name: '李登輝',
+    title: '總統任期：民國 77～89 年',
+    desc: '繼任總統後推動「務實外交」，承認兩岸分裂分治事實。任內成立行政院「陸委會」，並委託民間性質的「海基會」代表政府進行涉外與談判。主導兩岸第一次歷史性「辜汪會談」，奠定制度化協商基石。',
+    img: 'images/l05_clean/president_lee_teng_hui.jpg'
+  },
+  c4: {
+    name: '辜振甫',
+    title: '職稱：第一任海峽交流基金會（海基會）董事長',
+    desc: '民國82年，他代表臺灣官方受委託組織，在新加坡與中共海協會會長汪道涵進行「辜汪會談」，簽訂多項事務性協議，打破兩岸四十多年來不相往來的冰封狀態，是兩岸民間對口協商的靈魂人物。',
+    img: 'images/l05_clean/koo_wang_meeting.jpg'
+  },
+  c5: {
+    name: '汪道涵',
+    title: '職稱：第一任海峽兩岸關係協會（海協會）會長',
+    desc: '中共官方特設海協會並由其擔任首任會長，作為與臺灣海基會交涉的管道。民國82年與辜振甫於新加坡會晤，開啟了兩岸制度化對口協商新頁，其與辜董事長惺惺相惜之握手畫面已成歷史經典。',
+    img: 'images/l05_clean/koo_wang_meeting.jpg'
+  }
+};
+
+document.querySelectorAll('.figure-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.figure-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    
+    const bioId = item.dataset.bio;
+    const info = BIOS[bioId];
+    
+    document.getElementById('bioName').textContent = info.name;
+    document.getElementById('bioTitle').textContent = info.title;
+    document.getElementById('bioDesc').textContent = info.desc;
+    document.getElementById('bioImg').src = info.img;
+  });
+});
+
+// ================== 單元四：依序通關狀態機 ==================
+const CHALLENGE_POINTS = [32, 28, 40];
+let challengeState = {
+  current: 0,
+  completed: [false, false, false],
+  scores: [0, 0, 0]
+};
+
+function advanceChallenge(gameIdx, score) {
+  if (challengeState.completed[gameIdx]) return;
+  challengeState.completed[gameIdx] = true;
+  challengeState.scores[gameIdx] = score;
+
+  for (let i = 0; i < 3; i++) {
+    const step = document.getElementById('cStep' + (i + 1));
+    const icon = document.getElementById('cIcon' + (i + 1));
+    const conn = document.getElementById('cConn' + (i + 1));
+    if (!step) continue;
+    step.classList.remove('unlocked', 'completed');
+    if (challengeState.completed[i]) {
+      step.classList.add('completed');
+      if (icon) icon.textContent = '✅';
+    } else if (i === gameIdx + 1) {
+      step.classList.add('unlocked');
+      if (icon) icon.textContent = '🔓';
+    }
+    if (conn && challengeState.completed[i]) conn.classList.add('done');
+  }
+
+  const currentPanel = document.getElementById('cGame' + (gameIdx + 1));
+  if (currentPanel) currentPanel.classList.remove('active');
+
+  const nextIdx = gameIdx + 1;
+  if (nextIdx < 3) {
+    challengeState.current = nextIdx;
+    const nextPanel = document.getElementById('cGame' + (nextIdx + 1));
+    if (nextPanel) {
+      nextPanel.style.display = '';
+      setTimeout(() => nextPanel.classList.add('active'), 100);
+    }
+    if (nextIdx === 1) initGame2();
+    if (nextIdx === 2) initGame3();
+  } else {
+    showCertificate();
+  }
+}
+
+function showCertificate() {
+  for (let i = 1; i <= 3; i++) {
+    const panel = document.getElementById('cGame' + i);
+    if (panel) panel.classList.remove('active');
+  }
+
+  const now = new Date();
+  const dateStr = now.getFullYear() + ' 年 ' + (now.getMonth() + 1) + ' 月 ' + now.getDate() + ' 日';
+  const total = challengeState.scores.reduce((a, b) => a + b, 0);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box cert-popup">
+      <h2>🏆 通關證書</h2>
+      <p class="cert-subtitle">恭喜你完成「臺海兩岸關係的演變」三大互動挑戰！<br>你已掌握戰後兩岸關係的三個歷史分期、政策口號、中介機構與重要人物。</p>
+      <div class="cert-scores">
+        <div class="cert-score-row"><span>📅 挑戰一：時光重組</span><span class="cert-pts">${challengeState.scores[0]} / 32</span></div>
+        <div class="cert-score-row"><span>💬 挑戰二：政策口號配對</span><span class="cert-pts">${challengeState.scores[1]} / 28</span></div>
+        <div class="cert-score-row"><span>🃏 挑戰三：人物機構翻翻樂</span><span class="cert-pts">${challengeState.scores[2]} / 40</span></div>
+        <div class="cert-score-total"><span>總分</span><span class="cert-total-pts">${total} / 100</span></div>
+      </div>
+      <p class="cert-date">完成日期：${dateStr}</p>
+      <p class="cert-status" id="certStatus" style="font-size:13px; color:#546e7a; margin: 6px 0 14px;">⏳ 正在將通關紀錄上傳至資料庫...</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="certCloseBtn">✓ 關閉證書</button>
+        <button class="btn btn-secondary" id="certRetryBtn">🔄 重新挑戰</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  createConfetti();
+  playSound('correct');
+
+  saveCompletionToFirestore(total, dateStr, overlay);
+
+  overlay.querySelector('#certCloseBtn').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#certRetryBtn').addEventListener('click', () => {
+    overlay.remove();
+    resetAllChallenges();
+  });
+}
+
+function saveCompletionToFirestore(total, dateStr, overlay) {
+  const statusEl = overlay.querySelector('#certStatus');
+  if (!db) {
+    if (statusEl) {
+      statusEl.textContent = '⚠️ 未能連線至資料庫，本機紀錄未儲存。';
+      statusEl.style.color = '#c62828';
+    }
+    return;
+  }
+  const studentInfo = getStudentInfo();
+  if (!studentInfo || !studentInfo.classId || !studentInfo.name) {
+    if (statusEl) {
+      statusEl.textContent = '⚠️ 未取得學生資料，通關紀錄未儲存。';
+      statusEl.style.color = '#c62828';
+    }
+    return;
+  }
+  const payload = {
+    chapter: CHAPTER_CODE,
+    chapterTitle: CHAPTER_TITLE,
+    classId: studentInfo.classId,
+    name: studentInfo.name,
+    scores: challengeState.scores.slice(),
+    total: total,
+    clientDate: dateStr,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  db.collection('completions').add(payload)
+    .then(() => {
+      if (statusEl) {
+        statusEl.textContent = '✅ 通關紀錄已成功儲存！老師可在後台查閱。';
+        statusEl.style.color = '#2e7d32';
+      }
+    })
+    .catch(err => {
+      console.warn('Firestore 寫入失敗：', err);
+      if (statusEl) {
+        statusEl.textContent = '⚠️ 資料庫寫入失敗，請稍後再試或截圖留存。';
+        statusEl.style.color = '#c62828';
+      }
+    });
+}
+
+function resetAllChallenges() {
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    if (o.id !== 'studentModal') o.remove();
+  });
+  challengeState = { current: 0, completed: [false, false, false], scores: [0, 0, 0] };
+  for (let i = 0; i < 3; i++) {
+    const step = document.getElementById('cStep' + (i + 1));
+    const icon = document.getElementById('cIcon' + (i + 1));
+    const conn = document.getElementById('cConn' + (i + 1));
+    if (step) {
+      step.classList.remove('unlocked', 'completed');
+      if (i === 0) step.classList.add('unlocked');
+    }
+    if (icon) icon.textContent = i === 0 ? '🔓' : '🔒';
+    if (conn) conn.classList.remove('done');
+  }
+  const cert = document.getElementById('certificate');
+  if (cert) cert.style.display = 'none';
+  const cG2 = document.getElementById('cGame2');
+  if (cG2) { cG2.style.display = ''; cG2.classList.remove('active'); }
+  const cG3 = document.getElementById('cGame3');
+  if (cG3) { cG3.style.display = ''; cG3.classList.remove('active'); }
+  const cG1 = document.getElementById('cGame1');
+  if (cG1) cG1.classList.add('active');
+  const g1Msg = document.getElementById('g1Msg'); if (g1Msg) g1Msg.className = 'game-message';
+  const g2Msg = document.getElementById('g2Msg'); if (g2Msg) g2Msg.className = 'game-message';
+  const g3Msg = document.getElementById('g3Msg'); if (g3Msg) g3Msg.className = 'game-message';
+  initGame1();
+}
+
+function showCheckpointModal(gameIdx, score, maxScore, correctCount, totalItems) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <h2>⏸️ 挑戰 ${gameIdx + 1} 評分結果</h2>
+      <div class="result-score">${score} / ${maxScore}</div>
+      <p class="result-text">答對 ${correctCount} / ${totalItems} 題（錯誤每題扣 5 分，最低 0 分）</p>
+      <p class="retry-question">要重新挑戰拿更高分，還是直接以目前成績通關？</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cpRetry">🔄 再挑戰</button>
+        <button class="btn btn-primary" id="cpPass">✓ 以目前成績通關</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#cpRetry').addEventListener('click', () => {
+    overlay.remove();
+    if (gameIdx === 0) resetGame1();
+    if (gameIdx === 1) resetGame2();
+  });
+  overlay.querySelector('#cpPass').addEventListener('click', () => {
+    overlay.remove();
+    advanceChallenge(gameIdx, score);
+  });
+}
+
+// ====== 觸控拖曳輔助 (平板支援) ======
+let activeDragProxy = null;
+let activeDragSource = null;
+
+function setupTouchDrag(card, getDragData, handleDropOnTarget) {
+  card.addEventListener('touchstart', e => {
+    if (card.classList.contains('placed')) return;
+    activeDragSource = card;
+    const dragData = getDragData(card);
+    const touch = e.touches[0];
+    const rect = card.getBoundingClientRect();
+    const offsetX = touch.clientX - rect.left;
+    const offsetY = touch.clientY - rect.top;
+    let isMoving = false;
+
+    function onTouchMove(moveEvt) {
+      const t = moveEvt.touches[0];
+      if (!isMoving) {
+        if (Math.abs(t.clientX - touch.clientX) > 5 || Math.abs(t.clientY - touch.clientY) > 5) {
+          isMoving = true;
+          activeDragProxy = card.cloneNode(true);
+          activeDragProxy.classList.add('dragging-proxy');
+          activeDragProxy.style.position = 'fixed';
+          activeDragProxy.style.width = rect.width + 'px';
+          activeDragProxy.style.height = rect.height + 'px';
+          activeDragProxy.style.zIndex = '9999';
+          activeDragProxy.style.pointerEvents = 'none';
+          activeDragProxy.style.opacity = '0.85';
+          activeDragProxy.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
+          document.body.appendChild(activeDragProxy);
+          card.classList.add('dragging');
+        }
+      }
+      if (isMoving && activeDragProxy) {
+        moveEvt.preventDefault();
+        activeDragProxy.style.left = (t.clientX - offsetX) + 'px';
+        activeDragProxy.style.top = (t.clientY - offsetY) + 'px';
+        const elem = document.elementFromPoint(t.clientX, t.clientY);
+        const dropTarget = elem ? elem.closest('.timeline-slot, .slogan-bin') : null;
+        document.querySelectorAll('.timeline-slot, .slogan-bin').forEach(el => el.classList.remove('drag-over'));
+        if (dropTarget) dropTarget.classList.add('drag-over');
+      }
+    }
+
+    function onTouchEnd(endEvt) {
+      window.removeEventListener('touchmove', onTouchMove, { passive: false });
+      window.removeEventListener('touchend', onTouchEnd);
+      card.classList.remove('dragging');
+      if (isMoving && activeDragProxy) {
+        const t = endEvt.changedTouches[0];
+        const elem = document.elementFromPoint(t.clientX, t.clientY);
+        const dropTarget = elem ? elem.closest('.timeline-slot, .slogan-bin') : null;
+        document.querySelectorAll('.timeline-slot, .slogan-bin').forEach(el => el.classList.remove('drag-over'));
+        if (dropTarget) handleDropOnTarget(dropTarget, dragData);
+        activeDragProxy.remove();
+        activeDragProxy = null;
+      }
+      activeDragSource = null;
+    }
+
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd);
+  }, { passive: true });
+}
+
+// ----------------- 遊戲 1：時光重組 (拖曳排序) -----------------
+const TIMELINE_DATA = [
+  { year: '38年', event: '古寧頭戰役' },
+  { year: '39年', event: '韓戰爆發(美援)' },
+  { year: '47年', event: '八二三砲戰' },
+  { year: '60年', event: '退出聯合國' },
+  { year: '68年', event: '臺美斷交' },
+  { year: '76年', event: '解嚴開放探親' },
+  { year: '82年', event: '首次辜汪會談' },
+  { year: '97年', event: '正式大三通' }
+];
+
+let g1Placed = {};
+let g1SelectedEvent = null;
+let g1SelectedCard = null;
+
+function initGame1() {
+  g1Placed = {};
+  g1SelectedEvent = null;
+  g1SelectedCard = null;
+  document.getElementById('g1Score').textContent = '0';
+  document.getElementById('g1Msg').className = 'game-message';
+
+  const slotsContainer = document.getElementById('tSlots');
+  slotsContainer.innerHTML = '';
+  TIMELINE_DATA.forEach(d => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'timeline-slot-wrapper';
+
+    const yearBadge = document.createElement('div');
+    yearBadge.className = 'slot-year';
+    yearBadge.textContent = d.year;
+
+    const slot = document.createElement('div');
+    slot.className = 'timeline-slot';
+    slot.dataset.year = d.year;
+    slot.textContent = '拖曳至此';
+    slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('drag-over'); });
+    slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+    slot.addEventListener('drop', e => {
+      e.preventDefault();
+      slot.classList.remove('drag-over');
+      handleG1Drop(slot, e.dataTransfer.getData('text/plain'));
+    });
+    slot.addEventListener('click', () => {
+      if (g1SelectedEvent) {
+        handleG1Drop(slot, g1SelectedEvent);
+        if (g1SelectedCard) g1SelectedCard.classList.remove('selected-card');
+        g1SelectedCard = null;
+        g1SelectedEvent = null;
+      } else {
+        const oldVal = slot.dataset.placedEvent;
+        if (oldVal) {
+          const oldCard = document.querySelector(`#tPool .drag-card[data-event="${oldVal}"]`);
+          if (oldCard) oldCard.classList.remove('placed');
+          slot.textContent = '拖曳至此';
+          slot.className = 'timeline-slot';
+          delete slot.dataset.placedEvent;
+          delete g1Placed[slot.dataset.year];
+          playSound('flip');
+          updateG1Score();
+        }
+      }
+    });
+
+    wrapper.appendChild(yearBadge);
+    wrapper.appendChild(slot);
+    slotsContainer.appendChild(wrapper);
+  });
+
+  const pool = document.getElementById('tPool');
+  pool.innerHTML = '';
+  shuffle(TIMELINE_DATA.map(d => d.event)).forEach(evt => {
+    const card = document.createElement('div');
+    card.className = 'drag-card';
+    card.draggable = true;
+    card.textContent = evt;
+    card.dataset.event = evt;
+    card.addEventListener('dragstart', e => {
+      card.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', evt);
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.addEventListener('click', () => {
+      if (card.classList.contains('placed')) return;
+      if (g1SelectedCard === card) {
+        card.classList.remove('selected-card');
+        g1SelectedCard = null;
+        g1SelectedEvent = null;
+      } else {
+        if (g1SelectedCard) g1SelectedCard.classList.remove('selected-card');
+        card.classList.add('selected-card');
+        g1SelectedCard = card;
+        g1SelectedEvent = evt;
+      }
+    });
+    setupTouchDrag(card, c => c.dataset.event, (target, dragData) => {
+      if (target.classList.contains('timeline-slot')) handleG1Drop(target, dragData);
+    });
+    pool.appendChild(card);
+  });
+}
+
+function handleG1Drop(slot, eventName) {
+  const oldVal = slot.dataset.placedEvent;
+  if (oldVal) {
+    const oldCard = document.querySelector(`#tPool .drag-card[data-event="${oldVal}"]`);
+    if (oldCard) oldCard.classList.remove('placed');
+  }
+  slot.textContent = eventName;
+  slot.dataset.placedEvent = eventName;
+  slot.className = 'timeline-slot filled';
+  g1Placed[slot.dataset.year] = eventName;
+  const dragCard = document.querySelector(`#tPool .drag-card[data-event="${eventName}"]`);
+  if (dragCard) dragCard.classList.add('placed');
+  playSound('flip');
+  updateG1Score();
+}
+
+function updateG1Score() {
+  let correct = 0;
+  TIMELINE_DATA.forEach(d => {
+    if (g1Placed[d.year] === d.event) correct++;
+  });
+  document.getElementById('g1Score').textContent = Math.min(32, correct * 4);
+}
+
+function checkGame1() {
+  const total = TIMELINE_DATA.length;
+  let correct = 0;
+  let placedCount = 0;
+  TIMELINE_DATA.forEach(d => {
+    const placed = g1Placed[d.year];
+    const slot = document.querySelector(`.timeline-slot[data-year="${d.year}"]`);
+    if (!placed) return;
+    placedCount++;
+    if (placed === d.event) {
+      if (slot) slot.className = 'timeline-slot filled';
+      correct++;
+    } else {
+      if (slot) {
+        slot.className = 'timeline-slot wrong';
+        setTimeout(() => slot.classList.remove('wrong'), 1500);
+      }
+    }
+  });
+
+  const msg = document.getElementById('g1Msg');
+  if (placedCount < total) {
+    msg.className = 'game-message error';
+    msg.textContent = `尚有 ${total - placedCount} 題未放置，請先將所有事件拖曳到年代格中！`;
+    playSound('wrong');
+    return;
+  }
+  const wrong = total - correct;
+  let score = Math.max(0, 4 * correct - 5 * wrong);
+  score = Math.min(score, 32);
+
+  if (correct === total) {
+    msg.className = 'game-message success';
+    msg.textContent = '🎉 太優秀了！所有戰後重要事件時間順序完全正確！';
+    playSound('correct');
+    createConfetti();
+    setTimeout(() => advanceChallenge(0, 32), 800);
+  } else {
+    msg.className = 'game-message error';
+    msg.textContent = `答對 ${correct} 題，得分 ${score} / 32。再加油喔！`;
+    playSound('wrong');
+    setTimeout(() => showCheckpointModal(0, score, 32, correct, total), 600);
+  }
+}
+
+function resetGame1() {
+  initGame1();
+}
+
+// ----------------- 遊戲 2：政策口號對對碰 -----------------
+const SLOGAN_DATA = [
+  { text: '「武力解放臺灣」', cat: 'military' },
+  { text: '「光復大陸」/「反攻大陸」', cat: 'military' },
+  { text: '「三不政策」(不接觸/談判/妥協)', cat: 'confront' },
+  { text: '「一國兩制」方針', cat: 'confront' },
+  { text: '「三民主義統一中國」', cat: 'confront' },
+  { text: '開啟大小三通', cat: 'exchange' },
+  { text: '開放民眾赴陸探親', cat: 'exchange' }
+];
+
+let g2Placed = {};
+let g2SelectedSlogan = null;
+let g2SelectedCard = null;
+
+function initGame2() {
+  g2Placed = {};
+  g2SelectedSlogan = null;
+  g2SelectedCard = null;
+  document.getElementById('g2Score').textContent = '0';
+  document.getElementById('g2Msg').className = 'game-message';
+
+  document.querySelectorAll('.slogan-bin').forEach(bin => {
+    const h3 = bin.querySelector('h3');
+    const fresh = bin.cloneNode(false);
+    fresh.dataset.cat = bin.dataset.cat;
+    fresh.className = bin.className;
+    if (h3) fresh.appendChild(h3.cloneNode(true));
+    bin.parentNode.replaceChild(fresh, bin);
+
+    fresh.addEventListener('dragover', e => { e.preventDefault(); fresh.classList.add('drag-over'); });
+    fresh.addEventListener('dragleave', () => fresh.classList.remove('drag-over'));
+    fresh.addEventListener('drop', e => {
+      e.preventDefault();
+      fresh.classList.remove('drag-over');
+      handleG2Drop(fresh, e.dataTransfer.getData('text/plain'));
+    });
+    fresh.addEventListener('click', () => {
+      if (g2SelectedSlogan) {
+        handleG2Drop(fresh, g2SelectedSlogan);
+        if (g2SelectedCard) g2SelectedCard.classList.remove('selected-card');
+        g2SelectedCard = null;
+        g2SelectedSlogan = null;
+      }
+    });
+  });
+
+  const pool = document.getElementById('sPool');
+  pool.innerHTML = '';
+  shuffle(SLOGAN_DATA).forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'drag-card';
+    card.draggable = true;
+    card.textContent = item.text;
+    card.dataset.slogan = item.text;
+    card.addEventListener('dragstart', e => {
+      card.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', item.text);
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.addEventListener('click', () => {
+      if (card.classList.contains('placed')) return;
+      if (g2SelectedCard === card) {
+        card.classList.remove('selected-card');
+        g2SelectedCard = null;
+        g2SelectedSlogan = null;
+      } else {
+        if (g2SelectedCard) g2SelectedCard.classList.remove('selected-card');
+        card.classList.add('selected-card');
+        g2SelectedCard = card;
+        g2SelectedSlogan = item.text;
+      }
+    });
+    setupTouchDrag(card, c => c.dataset.slogan, (target, dragData) => {
+      if (target.classList.contains('slogan-bin')) handleG2Drop(target, dragData);
+    });
+    pool.appendChild(card);
+  });
+}
+
+function handleG2Drop(bin, sloganText) {
+  if (g2Placed[sloganText]) {
+    document.querySelectorAll('.slogan-bin .bin-card').forEach(c => {
+      if (c.textContent === sloganText) c.remove();
+    });
+  }
+  g2Placed[sloganText] = bin.dataset.cat;
+  playSound('flip');
+
+  const item = document.createElement('div');
+  item.className = 'bin-card';
+  item.textContent = sloganText;
+  item.addEventListener('click', e => {
+    e.stopPropagation();
+    delete g2Placed[sloganText];
+    item.remove();
+    const orig = document.querySelector(`#sPool .drag-card[data-slogan="${sloganText}"]`);
+    if (orig) orig.classList.remove('placed');
+    updateG2Score();
+    playSound('flip');
+  });
+  bin.appendChild(item);
+
+  const orig = document.querySelector(`#sPool .drag-card[data-slogan="${sloganText}"]`);
+  if (orig) orig.classList.add('placed');
+
+  updateG2Score();
+}
+
+function updateG2Score() {
+  let correct = 0;
+  Object.keys(g2Placed).forEach(k => {
+    const dataItem = SLOGAN_DATA.find(d => d.text === k);
+    if (dataItem && g2Placed[k] === dataItem.cat) correct++;
+  });
+  document.getElementById('g2Score').textContent = Math.min(28, correct * 4);
+}
+
+function checkGame2() {
+  const total = SLOGAN_DATA.length;
+  let correct = 0;
+  const placedCount = Object.keys(g2Placed).length;
+  Object.keys(g2Placed).forEach(k => {
+    const dataItem = SLOGAN_DATA.find(d => d.text === k);
+    if (dataItem && g2Placed[k] === dataItem.cat) correct++;
+  });
+
+  const msg = document.getElementById('g2Msg');
+  if (placedCount < total) {
+    msg.className = 'game-message error';
+    msg.textContent = `尚有 ${total - placedCount} 題未分類，請先將所有口號拖曳到分期盒中！`;
+    playSound('wrong');
+    return;
+  }
+  const wrong = total - correct;
+  let score = Math.max(0, 4 * correct - 5 * wrong);
+  score = Math.min(score, 28);
+
+  if (correct === total) {
+    msg.className = 'game-message success';
+    msg.textContent = '🎉 全對了！你對各時期的口號與政策發展瞭若指掌！';
+    playSound('correct');
+    createConfetti();
+    setTimeout(() => advanceChallenge(1, 28), 800);
+  } else {
+    msg.className = 'game-message error';
+    msg.textContent = `答對 ${correct} 題，得分 ${score} / 28。`;
+    playSound('wrong');
+    setTimeout(() => showCheckpointModal(1, score, 28, correct, total), 600);
+  }
+}
+
+function resetGame2() {
+  initGame2();
+}
+
+// ----------------- 遊戲 3：記憶翻牌配對 -----------------
+const CARDS_DATA = [
+  { id: 1, type: 'photo', value: '蔣中正', content: '蔣中正肖像', image: 'images/l05_clean/president_chiang_kai_shek.jpg' },
+  { id: 1, type: 'text', value: '蔣中正', content: '口號「光復大陸」，宣傳反攻，實行戒嚴穩定防線。' },
+  { id: 2, type: 'photo', value: '蔣經國', content: '蔣經國肖像', image: 'images/l05_clean/president_chiang_ching_kuo.jpg' },
+  { id: 2, type: 'text', value: '蔣經國', content: '提出「三不政策」對抗和平統戰，晚年宣布解嚴並開放大陸探親。' },
+  { id: 3, type: 'photo', value: '李登輝', content: '李登輝肖像', image: 'images/l05_clean/president_lee_teng_hui.jpg' },
+  { id: 3, type: 'text', value: '李登輝', content: '推動務實外交，成立陸委會與海基會，促成首次辜汪會談。' },
+  { id: 4, type: 'photo', value: '辜汪會談', content: '辜汪會談照片', image: 'images/l05_clean/koo_wang_meeting.jpg' },
+  { id: 4, type: 'text', value: '辜汪會談', content: '民國82年在新加坡舉行，是兩岸分裂分治後第一次正式民間受託協商。' }
+];
+
+let firstCard = null;
+let secondCard = null;
+let lockBoard = false;
+let matchesFound = 0;
+
+function initGame3() {
+  firstCard = null;
+  secondCard = null;
+  lockBoard = false;
+  matchesFound = 0;
+  document.getElementById('g3Score').textContent = '0';
+  document.getElementById('g3Msg').className = 'game-message';
+
+  const grid = document.getElementById('flipGrid');
+  grid.innerHTML = '';
+
+  shuffle(CARDS_DATA).forEach((c, idx) => {
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.dataset.matchId = c.id;
+    card.dataset.idx = idx;
+
+    const back = document.createElement('div');
+    back.className = 'card-face card-back';
+    back.textContent = '❓';
+
+    const front = document.createElement('div');
+    front.className = 'card-face card-front';
+    if (c.type === 'photo') {
+      front.innerHTML = `
+        <div class="flex-content">
+          <img src="${c.image}" alt="${c.value}">
+          <span style="font-size:11px;">${c.value}</span>
+        </div>
+      `;
+    } else {
+      front.textContent = c.content;
+    }
+
+    card.appendChild(back);
+    card.appendChild(front);
+    card.addEventListener('click', () => flipCard(card));
+    grid.appendChild(card);
+  });
+}
+
+function flipCard(card) {
+  if (lockBoard) return;
+  if (card === firstCard) return;
+  card.classList.add('flipped');
+  playSound('flip');
+  if (!firstCard) {
+    firstCard = card;
+    return;
+  }
+  secondCard = card;
+  lockBoard = true;
+  checkG3Match();
+}
+
+function checkG3Match() {
+  const isMatch = firstCard.dataset.matchId === secondCard.dataset.matchId;
+  if (isMatch) {
+    disableCards();
+  } else {
+    unflipCards();
+  }
+}
+
+function disableCards() {
+  firstCard.classList.add('matched');
+  secondCard.classList.add('matched');
+  matchesFound++;
+  document.getElementById('g3Score').textContent = matchesFound;
+  playSound('correct');
+  resetBoard();
+
+  if (matchesFound === CARDS_DATA.length / 2) {
+    const msg = document.getElementById('g3Msg');
+    msg.className = 'game-message success';
+    msg.textContent = '🎉 太棒了！你完美配對了所有重要歷史人物與他們的施政！';
+    createConfetti();
+    setTimeout(() => advanceChallenge(2, 40), 900);
+  }
+}
+
+function unflipCards() {
+  setTimeout(() => {
+    firstCard.classList.remove('flipped');
+    secondCard.classList.remove('flipped');
+    playSound('wrong');
+    resetBoard();
+  }, 1200);
+}
+
+function resetBoard() {
+  [firstCard, secondCard] = [null, null];
+  lockBoard = false;
+}
+
+function resetGame3() {
+  initGame3();
+}
+
+// ----------------- 通用隨機排序函數 -----------------
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// 初始化啟動（依序解鎖，僅初始化第一關）
+initGame1();
+</script>
+</body>
+</html>

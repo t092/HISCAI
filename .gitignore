@@ -1,0 +1,30 @@
+# ====== Markdown 文件 ======
+*.md
+!README.md
+
+# ====== PDF 文件 ======
+*.pdf
+
+# ====== agnes_mcp 目錄 ======
+/agnes_mcp/
+
+# ====== Python 快取（agnes_mcp 內產生） ======
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# ====== 作業系統 / 編輯器暫存 ======
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ====== Node / 其他 ======
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
