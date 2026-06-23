@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>5-2 臺海兩岸關係的演變 - 互動學習網頁</title>
+<title>第五章 戰後臺灣的外交與兩岸關係 - 互動學習網頁</title>
 <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1185,6 +1185,51 @@
   .summary-table tr:nth-child(2) td.col-period { color: #ef6c00; }
   .summary-table tr:nth-child(3) td.col-period { color: #2e7d32; }
 
+  /* ===== 外交分期（5-1）專用配色 ===== */
+  .timeline-card.d1::after { background: #1565c0; }
+  .timeline-card.d2::after { background: #ef6c00; }
+  .timeline-card.d3::after { background: #f9a825; }
+  .timeline-card.d1 h3 { color: #0d47a1; }
+  .timeline-card.d2 h3 { color: #e65100; }
+  .timeline-card.d3 h3 { color: #f57f17; }
+  .badge.b-blue { background: #1565c0; }
+  .badge.b-orange { background: #ef6c00; }
+  .badge.b-warm { background: #f9a825; color: #5d4037; }
+  .info-box {
+    background: var(--primary-light);
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 4px solid var(--primary);
+    margin: 16px 0;
+  }
+  .info-box.orange {
+    background: var(--accent-light);
+    border-left-color: var(--accent);
+  }
+  .info-box h5 {
+    font-size: 15px;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+  }
+  .info-box.orange h5 {
+    color: #e65100;
+  }
+  .info-box p {
+    font-size: 14px;
+    margin-bottom: 0;
+  }
+  .summary-section-title {
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--primary-dark);
+    margin: 24px 0 12px;
+    padding-left: 12px;
+    border-left: 4px solid var(--primary);
+  }
+  .summary-section-title:first-child {
+    margin-top: 0;
+  }
+
   /* 匯出列印樣式優化 */
   @media print {
     body {
@@ -1251,12 +1296,13 @@
   <!-- 頁首與 Tab 選單 -->
   <header>
     <div class="header-title">
-      <h1>🇹🇼 5-2 臺海兩岸關係的演變 🇨🇳</h1>
-      <p>國中歷史 1 下 L05 戰後臺灣的外交與兩岸關係 課堂 CAI 互動輔助教材</p>
+      <h1>🌐 第五章 戰後臺灣的外交與兩岸關係 🇹🇼</h1>
+      <p>國中歷史 1 下 L05 課堂 CAI 互動輔助教材（5-1 對外關係 + 5-2 兩岸關係）</p>
     </div>
     <div class="tabs">
       <button class="tab-btn active" data-tab="introTab">🏠 課程首頁</button>
-      <button class="tab-btn" data-tab="timelineTab">⏳ 歷史分期</button>
+      <button class="tab-btn" data-tab="diplomacyTab">🌐 對外關係</button>
+      <button class="tab-btn" data-tab="timelineTab">⏳ 兩岸關係</button>
       <button class="tab-btn" data-tab="agencyTab">🏛️ 機構與人物</button>
       <button class="tab-btn" data-tab="summaryTab">📊 重點大整理</button>
       <button class="tab-btn" data-tab="gameTab">🎮 互動挑戰</button>
@@ -1268,7 +1314,7 @@
     <div class="assistant-avatar">🐻</div>
     <div class="assistant-text">
       <h4 id="assistantTitle">黑熊小助手提示</h4>
-      <p id="assistantDesc">歡迎來到臺海兩岸關係學習網頁！請點擊上方選單開始學習！平板使用者可直接用手指拖曳及點擊喔！</p>
+      <p id="assistantDesc">歡迎來到第五章「戰後臺灣的外交與兩岸關係」學習網頁！包含 5-1 對外關係與 5-2 兩岸關係，點擊上方選單開始學習！平板可直接拖曳及點擊喔！</p>
     </div>
   </div>
 
@@ -1277,32 +1323,169 @@
     <div class="card">
       <div class="intro-grid">
         <div class="intro-text">
-          <h2>探討兩岸政權的半世紀演變</h2>
+          <h2>戰後臺灣的外交與兩岸關係</h2>
           <p>
-            自民國 38 年（西元 1949 年）中華民國政府遷臺後，海峽兩岸形成分裂分治的局面。兩岸關係隨著國際局勢與雙方政策的轉變，從早期的軍事對抗，走向後來的政治對峙，再到近年來的經貿與文化交流。
+            民國38年（1949年）中華民國政府遷臺後，臺灣同時面臨兩大挑戰：一方面在國際外交上力求維繫合法地位，歷經鞏固外交、彈性外交、務實外交三個階段的奮鬥；另一方面與中華人民共和國從武力對抗走向政治對峙，再到經貿文化交流。
           </p>
           <p>
-            本網頁將帶領你透過互動時間軸、探討兩岸半官方式的談判窗口（陸委會、海基會等），並進行好玩的時光排序與口號配對遊戲。讓我們一起了解這段深深影響臺灣人民生活與國際外交的重要歷史吧！
+            本互動講義涵蓋課文第五章兩大主題（5-1 對外關係 ＋ 5-2 兩岸關係），帶你透過互動時間軸、中介機構介紹，以及時光排序、口號分類和翻牌配對遊戲，全方位掌握這段影響臺灣深遠的歷史！
           </p>
           <div class="goals-list">
-            <h3>📖 本課學習重點</h3>
+            <h3>📖 本章學習重點</h3>
             <ul>
-              <li>了解兩岸關係發展的三個歷史分期與特徵。</li>
-              <li>理解各時期的兩岸宣傳標語、外交政策與口號的關聯。</li>
-              <li>認識海基會與海協會等中介交流機構的定位與重要會談。</li>
+              <li><b>5-1</b>：指出戰後臺灣外交政策的三個主要演變時期（鞏固/彈性/務實）及其核心方向。</li>
+              <li><b>5-1</b>：說明冷戰架構（韓戰、中美共同防禦條約、美援）如何穩定臺灣安全。</li>
+              <li><b>5-1</b>：分析中華民國退出聯合國與中美斷交的背景與影響。</li>
+              <li><b>5-2</b>：了解兩岸關係發展的三個歷史分期（武力對抗/政治對峙/兩岸交流）與特徵。</li>
+              <li><b>5-2</b>：認識海基會與海協會等中介交流機構的定位與重要會談（辜汪會談）。</li>
               <li>能將戰後臺灣的重要歷史事件與領導人物進行時間排序。</li>
             </ul>
           </div>
         </div>
         <div class="intro-img-container">
-          <img src="PIC/JinManAndMazou.png" alt="兩岸對峙地圖">
-          <span>戰後兩岸對抗時期的前線金門與馬祖地理位置圖</span>
+          <img src="PIC/CandM.jpg" alt="韓戰局勢圖">
+          <span>韓戰的爆發促使美國將臺灣海峽納入其亞洲反共防禦網</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ================== 頁面二：歷史分期 ================== -->
+  <!-- ================== 頁面二：對外關係 (5-1) ================== -->
+  <div id="diplomacyTab" class="tab-content">
+    <!-- 外交分期卡片選單 -->
+    <div class="timeline-nav" id="dipNav">
+      <div class="timeline-card d1 active" data-period="dp1">
+        <h3>🔵 鞏固外交時期</h3>
+        <div class="years">民國 38～60 年</div>
+        <div class="slogan-preview">「確保臺灣，光復大陸」</div>
+      </div>
+      <div class="timeline-card d2" data-period="dp2">
+        <h3>🟡 彈性外交時期</h3>
+        <div class="years">民國 60～77 年</div>
+        <div class="slogan-preview">與無邦交國發展實質交流</div>
+      </div>
+      <div class="timeline-card d3" data-period="dp3">
+        <h3>🟢 務實外交時期</h3>
+        <div class="years">民國 77 年～現今</div>
+        <div class="slogan-preview">以經濟、民主成就拓展國際生存</div>
+      </div>
+    </div>
+
+    <!-- 外交時期一：鞏固外交 -->
+    <div id="dp1" class="card period-detail active">
+      <span class="badge b-blue">鞏固外交時期 (民國38~60年)</span>
+      <div class="period-layout">
+        <div class="detail-section">
+          <h4>🛡️ 韓戰、中美協防與美援灌注</h4>
+          <p>
+            政府遷臺初期，國際與臺海局勢風雨飄搖。民國39年<b>韓戰爆發</b>，美國為了防堵共產主義在東亞擴張，改變政策，派遣<b>第七艦隊協防臺灣海峽</b>，阻絕了中共對臺灣的武力犯臺企圖。
+          </p>
+          <p>
+            民國43年，我國與美國簽訂<b>《中美共同防禦條約》</b>，正式將臺灣納入東亞反共防衛體系的一環，臺海局勢轉危為安，奠定了後續數十年發展的基石。
+          </p>
+          <div class="info-box">
+            <h5>🤝 珍貴的「美援」歲月（民國40~54年）</h5>
+            <p>
+              在這15年間，美國共提供臺灣近<b>15億美元</b>的經濟援助，極大地幫助了交通與工業基礎建設（如台電電力網重建）。軍事上派遣<b>美軍顧問團</b>駐臺指導，並提供各類軍用物資。當時的麵粉袋印有中美握手標誌，常被基層民眾縫製成有「中美合作」字樣的內衣褲，成為當時生活記憶的標誌。
+            </p>
+          </div>
+          <div class="key-events-list">
+            <b>🔑 本期外交政策方針與核心事件：</b>
+            <ul>
+              <li><b>奮鬥方針：</b>謀求「確保臺灣，光復大陸」，致力爭取邦交國支持，維護唯一合法政府地位。</li>
+              <li><b>民國39年：</b>韓戰爆發，第七艦隊協防臺灣海峽。</li>
+              <li><b>民國40年：</b>美援開始（持續至民國54年止）。</li>
+              <li><b>民國43年：</b>我國與美國簽訂《中美共同防禦條約》。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="period-media">
+          <div class="media-box">
+            <img src="ROCUSAP.jpg" alt="西太平洋戰略防線">
+            <span>第一島鏈防禦體系：中美共同防禦條約確立了臺灣的防禦地位</span>
+          </div>
+          <div class="media-box">
+            <img src="images/l05_clean/us_aid_flour_sack.jpg" alt="美援麵粉袋">
+            <span>印有「中美合作」及兩國國旗與握手標誌的物資包裝</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 外交時期二：彈性外交 -->
+    <div id="dp2" class="card period-detail">
+      <span class="badge b-orange">彈性外交時期 (民國60~77年)</span>
+      <div class="period-layout">
+        <div class="detail-section">
+          <h4>🌪️ 退出聯合國與中美斷交衝擊</h4>
+          <p>
+            到了民國60年代，國際局勢發生劇烈變動。民國60年（1971年）聯合國大會通過<b>第2758號決議</b>，將中國在聯合國的「中國席位」代表權交給中華人民共和國政府，我國政府宣布退出聯合國。此後，大量友邦相繼與我國斷交，外交陷入嚴重孤立。
+          </p>
+          <p>
+            民國68年，長期盟友<b>美國也宣布與我國斷交</b>，轉而與中華人民共和國建交。為保障兩國實質交往，美國國會通過<b>《臺灣關係法》</b>，以維持非官方的經貿與文化往來，並承諾對臺提供防禦性武器。
+          </p>
+          <div class="info-box orange">
+            <h5>💡 轉型「彈性外交」，維繫國際空間</h5>
+            <p>
+              面對接連的打擊，我國政府雖然在政治上依然堅持「中華民國是中國唯一合法政府」，但在實務上展現「彈性」，不再受困於「漢賊不兩立」的教條。轉而致力與無邦交國家開展<b>非官方的實質關係</b>，透過經貿、技術、學術及文化交流，成功與美、日、歐等大國維持緊密聯繫。
+            </p>
+          </div>
+          <div class="key-events-list">
+            <b>🔑 本期外交政策方針與核心事件：</b>
+            <ul>
+              <li><b>奮鬥方針：</b>採彈性策略，突破外交封鎖，側重與無邦交國發展實質性雙邊交流。</li>
+              <li><b>民國60年：</b>聯大通過第2758號決議，我國退出聯合國。</li>
+              <li><b>民國68年：</b>美國與我國斷交，另制定《臺灣關係法》維持非官方往來。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="period-media">
+          <div class="media-box">
+            <img src="PIC/2758.jpg" alt="退出聯合國大會現場">
+            <span>民國60年，聯合國大會針對中國代表權席位進行決議的現場</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 外交時期三：務實外交 -->
+    <div id="dp3" class="card period-detail">
+      <span class="badge b-warm">務實外交時期 (民國77年~現今)</span>
+      <div class="period-layout">
+        <div class="detail-section">
+          <h4>🌱 務實面對分裂分治，用經濟與民主立足世界</h4>
+          <p>
+            民國77年李登輝繼任總統後，臺灣正式展開「<b>務實外交</b>」時期。政府做出了重大的觀念變革：<b>不再堅持</b>中華民國代表中國唯一合法政府，正面承認海峽兩岸是「<b>分裂分治</b>」的政治狀態。
+          </p>
+          <p>
+            臺灣憑藉著蓬勃的<b>經濟實力</b>以及<b>政治民主化</b>（如總統直選、解嚴）的傑出成就，贏得國際社會的尊敬。我國積極參與世界貿易組織（WTO）、亞太經濟合作會議（APEC）等重要國際組織，善盡國際公民義務。
+          </p>
+          <div class="info-box" style="background:#fffbeb; border-left-color:var(--accent);">
+            <h5>✈️ 免簽證待遇與當前挑戰</h5>
+            <p>
+              由於民主成就與經濟實力，我國護照的國際信用大幅提升，迄今已獲得全球100多個國家給予免簽證或落地簽證待遇，極大地便利了國民出國。然而，國際空間依然遭到中華人民共和國的不斷打壓與外交圍堵，邦交國數量下降，國際地位仍需全體國人共同努力鞏固與開拓。
+            </p>
+          </div>
+          <div class="key-events-list">
+            <b>🔑 本期外交政策方針與核心事件：</b>
+            <ul>
+              <li><b>奮鬥方針：</b>不再爭奪唯一中國代表權，以經濟實力與民主成就突破中華人民共和國的外交封鎖，積極參與非官方與政府間國際組織。</li>
+              <li><b>民國77年起：</b>李登輝推動「務實外交」。</li>
+              <li><b>近年來：</b>善盡國際社會公民責任，護照免簽證國家數量大幅增加。</li>
+            </ul>
+          </div>
+        </div>
+        <div class="period-media">
+          <div class="media-box">
+            <img src="PIC/Tforeign.png" alt="邦交國與免簽國變化圖">
+            <span>即使邦交國數量逐年下降，我國仍靠經濟與民主成就取得多國免簽資格</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== 頁面三：兩岸關係 (5-2) ================== -->
   <div id="timelineTab" class="tab-content">
     <!-- 分期卡片選單 -->
     <div class="timeline-nav">
@@ -1536,14 +1719,83 @@
     </div>
   </div>
 
-  <!-- ================== 頁面四：重點大整理 ================== -->
+  <!-- ================== 頁面五：重點大整理 ================== -->
   <div id="summaryTab" class="tab-content">
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h2 style="font-size:22px; color:var(--primary-dark);">📊 臺海兩岸關係歷史分期大整理</h2>
+        <h2 style="font-size:22px; color:var(--primary-dark);">📊 第五章 重點大整理</h2>
         <button class="btn btn-primary" onclick="window.print()">🖨️ 列印/儲存為學習單</button>
       </div>
 
+      <!-- 5-1 外交政策分期表 -->
+      <h3 class="summary-section-title">🌐 5-1 戰後臺灣的對外關係</h3>
+      <div class="summary-table-wrapper">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th style="width:15%;">外交時期</th>
+              <th style="width:15%;">時間</th>
+              <th style="width:25%;">政策焦點與奮鬥目標</th>
+              <th style="width:25%;">國際局勢與關鍵背景</th>
+              <th style="width:20%;">重大核心事件與成果</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="col-period">🔵 鞏固外交</td>
+              <td>民國 38～60 年<br>(1949～1971)</td>
+              <td>
+                • 目標：「確保臺灣，光復大陸」<br>
+                • 致力爭取友邦，維繫在國際上代表中國的「唯一合法政府」地位。
+              </td>
+              <td>
+                • 韓戰爆發，冷戰對峙形成。<br>
+                • 美國派遣第七艦隊協防臺海，將臺灣納入亞太防共體系。
+              </td>
+              <td>
+                • <b>美援</b>（M40~M54）提供近15億美元軍事與經濟援助。<br>
+                • 簽訂<b>《中美共同防禦條約》</b>（M43），奠定臺海安全。
+              </td>
+            </tr>
+            <tr>
+              <td class="col-period">🟡 彈性外交</td>
+              <td>民國 60～77 年<br>(1971～1988)</td>
+              <td>
+                • 目標：突破外交孤立困境。<br>
+                • 雖在政治上仍堅持唯一合法政府，但實務上靈活發展與無邦交國的<b>非官方實質交流</b>。
+              </td>
+              <td>
+                • 國際環境巨變，中華人民共和國取代我國在聯合國的席位。<br>
+                • 美國與我國斷交，大量邦交國流失。
+              </td>
+              <td>
+                • <b>退出聯合國</b>（M60，聯大第2758號決議）。<br>
+                • <b>中美斷交</b>（M68），美國另制定<b>《臺灣關係法》</b>維持實質經貿與文化往來。
+              </td>
+            </tr>
+            <tr>
+              <td class="col-period">🟢 務實外交</td>
+              <td>民國 77 年～現今<br>(1988～現今)</td>
+              <td>
+                • 目標：拓展國際空間，維護生存權。<br>
+                • <b>不再堅持</b>代表中國唯一合法政府，強調兩岸是「<b>分裂分治</b>」狀態。
+              </td>
+              <td>
+                • 臺灣政治<b>民主化</b>與強大<b>經濟實力</b>贏得國際尊敬。<br>
+                • 中共持續在國際外交空間施壓、打擊我國。
+              </td>
+              <td>
+                • 李登輝推動務實外交（M77）。<br>
+                • 積極加入APEC、WTO等國際組織。<br>
+                • 獲得全球100多個國家給予<b>免簽證</b>待遇。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 5-2 兩岸關係分期表 -->
+      <h3 class="summary-section-title" style="margin-top:32px;">⏳ 5-2 臺海兩岸關係的演變</h3>
       <div class="summary-table-wrapper">
         <table class="summary-table">
           <thead>
@@ -1644,7 +1896,7 @@
         <div class="step-badge">1</div>
         <div class="step-body">
           <div class="step-title">📅 時光重組</div>
-          <div class="step-pts">32 分</div>
+          <div class="step-pts">30 分</div>
         </div>
         <div class="step-icon" id="cIcon1">🔓</div>
       </div>
@@ -1653,7 +1905,7 @@
         <div class="step-badge">2</div>
         <div class="step-body">
           <div class="step-title">💬 政策口號配對</div>
-          <div class="step-pts">28 分</div>
+          <div class="step-pts">30 分</div>
         </div>
         <div class="step-icon" id="cIcon2">🔒</div>
       </div>
@@ -1672,10 +1924,10 @@
     <div id="cGame1" class="card c-game-panel active">
       <div class="game-header">
         <div>
-          <h3>📅 挑戰一：時光重組（32 分）</h3>
-          <p style="font-size:13px; color:var(--text-sub); margin-top:4px;">請將下方的歷史事件卡片，拖曳（或點選配對）到上方正確的年代空格中！每題 4 分，錯一個扣 5 分。</p>
+          <h3>📅 挑戰一：時光重組（30 分）</h3>
+          <p style="font-size:13px; color:var(--text-sub); margin-top:4px;">請將下方的歷史事件卡片，拖曳（或點選配對）到上方正確的年代空格中！每題 3 分，錯一個扣 5 分。</p>
         </div>
-        <div class="game-score-box">得分：<b id="g1Score">0</b> / 32</div>
+        <div class="game-score-box">得分：<b id="g1Score">0</b> / 30</div>
       </div>
 
       <div class="timeline-game-layout">
@@ -1695,23 +1947,23 @@
     <div id="cGame2" class="card c-game-panel">
       <div class="game-header">
         <div>
-          <h3>💬 挑戰二：政策口號分類配對（28 分）</h3>
-          <p style="font-size:13px; color:var(--text-sub); margin-top:4px;">拖曳（或點選配對）左邊的標語晶片，投入右邊正確的歷史分期盒中！每題 4 分，錯一個扣 5 分。</p>
+          <h3>💬 挑戰二：政策口號分類配對（30 分）</h3>
+          <p style="font-size:13px; color:var(--text-sub); margin-top:4px;">拖曳（或點選配對）左邊的標語晶片，投入右邊正確的歷史分期盒中！每題 3 分，錯一個扣 5 分。</p>
         </div>
-        <div class="game-score-box">得分：<b id="g2Score">0</b> / 28</div>
+        <div class="game-score-box">得分：<b id="g2Score">0</b> / 30</div>
       </div>
 
       <div class="slogan-game-layout">
         <div class="slogan-drag-pool" id="sPool"></div>
         <div class="slogan-bins">
-          <div class="slogan-bin b1" data-cat="military">
-            <h3>🔴 武力對抗期</h3>
+          <div class="slogan-bin b1" data-cat="early">
+            <h3>🔴 鞏固外交/武力對抗期</h3>
           </div>
-          <div class="slogan-bin b2" data-cat="confront">
-            <h3>🟡 政治對峙期</h3>
+          <div class="slogan-bin b2" data-cat="middle">
+            <h3>🟡 彈性外交/政治對峙期</h3>
           </div>
-          <div class="slogan-bin b3" data-cat="exchange">
-            <h3>🟢 兩岸交流期</h3>
+          <div class="slogan-bin b3" data-cat="late">
+            <h3>🟢 務實外交/兩岸交流期</h3>
           </div>
         </div>
       </div>
@@ -1747,7 +1999,7 @@
     <div id="certificate" class="card cert-card" style="display:none;">
       <div class="cert-inner">
         <h1 class="cert-title">🏆 通關證書</h1>
-        <p class="cert-subtitle">恭喜你完成「臺海兩岸關係的演變」三大互動挑戰！<br>你已掌握戰後兩岸關係的三個歷史分期、政策口號、中介機構與重要人物。</p>
+        <p class="cert-subtitle">恭喜你完成「戰後臺灣的外交與兩岸關係」三大互動挑戰！<br>你已掌握5-1外交三時期與5-2兩岸三分期的政策口號、中介機構與重要人物。</p>
         <div class="cert-scores">
           <div class="cert-score-row">
             <span>📅 挑戰一：時光重組</span>
@@ -1794,7 +2046,7 @@ try {
 }
 
 const CHAPTER_CODE = 'L05';
-const CHAPTER_TITLE = '臺海兩岸關係的演變';
+const CHAPTER_TITLE = '戰後臺灣的外交與兩岸關係';
 
 function getStudentInfo() {
   try {
@@ -1950,19 +2202,22 @@ function updateAssistant(tabId) {
   
   if (tabId === 'introTab') {
     title.textContent = '黑熊小助手提示';
-    desc.textContent = '歡迎來到兩岸關係學習網頁！請點擊上方選單開始學習！平板使用者可直接用手指拖曳及點擊喔！';
+    desc.textContent = '歡迎來到第五章「戰後臺灣的外交與兩岸關係」學習網頁！包含 5-1 對外關係與 5-2 兩岸關係，點擊上方選單開始學習！平板可直接拖曳及點擊喔！';
+  } else if (tabId === 'diplomacyTab') {
+    title.textContent = '🌐 對外關係學習中';
+    desc.textContent = '請點選藍、橘、黃三張不同的外交時期卡片，詳細閱讀鞏固外交、彈性外交與務實外交的歷史變遷！';
   } else if (tabId === 'timelineTab') {
-    title.textContent = '⏳ 分期時間軸學習中';
-    desc.textContent = '請點選紅、黃、綠三張不同的分期卡片，詳細閱讀每個時期的歷史事件與外交兩岸關係政策！';
+    title.textContent = '⏳ 兩岸關係分期學習中';
+    desc.textContent = '請點選紅、黃、綠三張不同的分期卡片，詳細閱讀武力對抗、政治對峙與兩岸交流的歷史演變！';
   } else if (tabId === 'agencyTab') {
     title.textContent = '🏛️ 機構與人物學習中';
-    desc.textContent = '注意對照「官方」和「民間」組織。下方重要歷史人物點選後可查看總統們的重大施政喔！';
+    desc.textContent = '注意對照「官方」與「民間」雙軌組織。下方重要歷史人物點選後可查看各時期決策者生平！';
   } else if (tabId === 'summaryTab') {
     title.textContent = '📊 重點大整理與匯出';
-    desc.textContent = '這是本課的三大歷史分期精華對照表。你可以點選「列印/儲存為學習單」下載列印成實體考前衝刺大補帖！';
+    desc.textContent = '這是本課對外關係與兩岸關係的分期精華對照表。你可以點選「列印/儲存為學習單」下載列印成實體大補帖！';
   } else if (tabId === 'gameTab') {
     title.textContent = '🎮 互動挑戰';
-    desc.textContent = '三關依序登場：時光重組(32分) → 政策口號配對(28分) → 翻牌配對(40分)，通關後獲得證書並上傳成績！';
+    desc.textContent = '三關依序登場：時光重組(30分) → 政策口號配對(30分) → 翻牌配對(40分)，通關後獲得證書並上傳成績！';
   }
 }
 
@@ -2028,7 +2283,7 @@ document.querySelectorAll('.figure-item').forEach(item => {
 });
 
 // ================== 單元四：依序通關狀態機 ==================
-const CHALLENGE_POINTS = [32, 28, 40];
+const CHALLENGE_POINTS = [30, 30, 40];
 let challengeState = {
   current: 0,
   completed: [false, false, false],
@@ -2089,10 +2344,10 @@ function showCertificate() {
   overlay.innerHTML = `
     <div class="modal-box cert-popup">
       <h2>🏆 通關證書</h2>
-      <p class="cert-subtitle">恭喜你完成「臺海兩岸關係的演變」三大互動挑戰！<br>你已掌握戰後兩岸關係的三個歷史分期、政策口號、中介機構與重要人物。</p>
+      <p class="cert-subtitle">恭喜你完成「戰後臺灣的外交與兩岸關係」三大互動挑戰！<br>你已掌握5-1外交與5-2兩岸關係的歷史分期、政策口號、中介機構與重要人物。</p>
       <div class="cert-scores">
-        <div class="cert-score-row"><span>📅 挑戰一：時光重組</span><span class="cert-pts">${challengeState.scores[0]} / 32</span></div>
-        <div class="cert-score-row"><span>💬 挑戰二：政策口號配對</span><span class="cert-pts">${challengeState.scores[1]} / 28</span></div>
+        <div class="cert-score-row"><span>📅 挑戰一：時光重組</span><span class="cert-pts">${challengeState.scores[0]} / 30</span></div>
+        <div class="cert-score-row"><span>💬 挑戰二：政策口號配對</span><span class="cert-pts">${challengeState.scores[1]} / 30</span></div>
         <div class="cert-score-row"><span>🃏 挑戰三：人物機構翻翻樂</span><span class="cert-pts">${challengeState.scores[2]} / 40</span></div>
         <div class="cert-score-total"><span>總分</span><span class="cert-total-pts">${total} / 100</span></div>
       </div>
@@ -2285,10 +2540,12 @@ function setupTouchDrag(card, getDragData, handleDropOnTarget) {
 // ----------------- 遊戲 1：時光重組 (拖曳排序) -----------------
 const TIMELINE_DATA = [
   { year: '38年', event: '古寧頭戰役' },
-  { year: '39年', event: '韓戰爆發(美援)' },
+  { year: '39年', event: '韓戰爆發，美第七艦隊協防' },
+  { year: '43年', event: '簽訂中美共同防禦條約' },
   { year: '47年', event: '八二三砲戰' },
-  { year: '60年', event: '退出聯合國' },
-  { year: '68年', event: '臺美斷交' },
+  { year: '54年', event: '美援宣告結束' },
+  { year: '60年', event: '我國退出聯合國' },
+  { year: '68年', event: '美國與我國斷交' },
   { year: '76年', event: '解嚴開放探親' },
   { year: '82年', event: '首次辜汪會談' },
   { year: '97年', event: '正式大三通' }
@@ -2406,7 +2663,7 @@ function updateG1Score() {
   TIMELINE_DATA.forEach(d => {
     if (g1Placed[d.year] === d.event) correct++;
   });
-  document.getElementById('g1Score').textContent = Math.min(32, correct * 4);
+  document.getElementById('g1Score').textContent = Math.min(30, correct * 3);
 }
 
 function checkGame1() {
@@ -2437,20 +2694,20 @@ function checkGame1() {
     return;
   }
   const wrong = total - correct;
-  let score = Math.max(0, 4 * correct - 5 * wrong);
-  score = Math.min(score, 32);
+  let score = Math.max(0, 3 * correct - 5 * wrong);
+  score = Math.min(score, 30);
 
   if (correct === total) {
     msg.className = 'game-message success';
     msg.textContent = '🎉 太優秀了！所有戰後重要事件時間順序完全正確！';
     playSound('correct');
     createConfetti();
-    setTimeout(() => advanceChallenge(0, 32), 800);
+    setTimeout(() => advanceChallenge(0, 30), 800);
   } else {
     msg.className = 'game-message error';
-    msg.textContent = `答對 ${correct} 題，得分 ${score} / 32。再加油喔！`;
+    msg.textContent = `答對 ${correct} 題，得分 ${score} / 30。再加油喔！`;
     playSound('wrong');
-    setTimeout(() => showCheckpointModal(0, score, 32, correct, total), 600);
+    setTimeout(() => showCheckpointModal(0, score, 30, correct, total), 600);
   }
 }
 
@@ -2460,13 +2717,16 @@ function resetGame1() {
 
 // ----------------- 遊戲 2：政策口號對對碰 -----------------
 const SLOGAN_DATA = [
-  { text: '「武力解放臺灣」', cat: 'military' },
-  { text: '「光復大陸」/「反攻大陸」', cat: 'military' },
-  { text: '「三不政策」(不接觸/談判/妥協)', cat: 'confront' },
-  { text: '「一國兩制」方針', cat: 'confront' },
-  { text: '「三民主義統一中國」', cat: 'confront' },
-  { text: '開啟大小三通', cat: 'exchange' },
-  { text: '開放民眾赴陸探親', cat: 'exchange' }
+  { text: '「武力解放臺灣」', cat: 'early' },
+  { text: '「反攻大陸」/「消滅朱毛」', cat: 'early' },
+  { text: '美國派遣第七艦隊協防臺灣海峽', cat: 'early' },
+  { text: '「三不政策」(不接觸、不談判、不妥協)', cat: 'middle' },
+  { text: '「一國兩制」和平統戰', cat: 'middle' },
+  { text: '我國退出聯合國，邦交國面臨斷交潮', cat: 'middle' },
+  { text: '制定《臺灣關係法》維持實質經貿往來', cat: 'middle' },
+  { text: '不堅持唯一合法政府，強調兩岸「分裂分治」', cat: 'late' },
+  { text: '設立海基會與海協會，開啟制度化協商', cat: 'late' },
+  { text: '拓展國際生存空間，加入WTO與APEC', cat: 'late' }
 ];
 
 let g2Placed = {};
@@ -2573,7 +2833,7 @@ function updateG2Score() {
     const dataItem = SLOGAN_DATA.find(d => d.text === k);
     if (dataItem && g2Placed[k] === dataItem.cat) correct++;
   });
-  document.getElementById('g2Score').textContent = Math.min(28, correct * 4);
+  document.getElementById('g2Score').textContent = Math.min(30, correct * 3);
 }
 
 function checkGame2() {
@@ -2593,20 +2853,20 @@ function checkGame2() {
     return;
   }
   const wrong = total - correct;
-  let score = Math.max(0, 4 * correct - 5 * wrong);
-  score = Math.min(score, 28);
+  let score = Math.max(0, 3 * correct - 5 * wrong);
+  score = Math.min(score, 30);
 
   if (correct === total) {
     msg.className = 'game-message success';
     msg.textContent = '🎉 全對了！你對各時期的口號與政策發展瞭若指掌！';
     playSound('correct');
     createConfetti();
-    setTimeout(() => advanceChallenge(1, 28), 800);
+    setTimeout(() => advanceChallenge(1, 30), 800);
   } else {
     msg.className = 'game-message error';
-    msg.textContent = `答對 ${correct} 題，得分 ${score} / 28。`;
+    msg.textContent = `答對 ${correct} 題，得分 ${score} / 30。`;
     playSound('wrong');
-    setTimeout(() => showCheckpointModal(1, score, 28, correct, total), 600);
+    setTimeout(() => showCheckpointModal(1, score, 30, correct, total), 600);
   }
 }
 
