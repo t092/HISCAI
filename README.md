@@ -6,8 +6,11 @@
 
 ```
 ├── index.html                     # CAI 主入口頁（年級/學期/章節總覽）
-├── l05cross-strait-relations.html # L05 臺海兩岸關係的演變
-├── l06 economy-society.html       # L06 戰後臺灣的經濟與社會
+├── 7B/                            # 七年級下學期課程目錄
+│   ├── l04-postwar-politics.html  # L04 戰後臺灣的政治
+│   ├── l05cross-strait-relations.html # L05 戰後臺灣的外交與兩岸關係
+│   ├── l06 economy-society.html   # L06 戰後臺灣的經濟與社會
+│   └── images/                    # 課程圖片素材
 ├── teacher.html                   # 教師後台（Firebase Auth 登入）
 └── .gitignore
 ```

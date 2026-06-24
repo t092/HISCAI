@@ -1,0 +1,2756 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第四章 戰後臺灣的政治 - 互動學習網頁</title>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore-compat.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #00796b;
+    --primary-light: #e0f2f1;
+    --primary-dark: #004d40;
+    --accent: #ff6f00;
+    --accent-light: #fff3e0;
+    --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e4ecf5 100%);
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --text-main: #2c3e50;
+    --text-sub: #546e7a;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    --border-radius: 20px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* 歷史分期色系 */
+    --period-early: #c62828;      /* 戰後初期與二二八：深紅 */
+    --period-early-light: #ffebee;
+    --period-middle: #37474f;     /* 戒嚴與白色恐怖：鐵灰藍 */
+    --period-middle-light: #eceff1;
+    --period-late: #2e7d32;       /* 民主時代：翠綠 */
+    --period-late-light: #e8f5e9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: "Noto Sans TC", "Outfit", sans-serif;
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    color: var(--text-main);
+    line-height: 1.6;
+    padding-bottom: 60px;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* 導航欄與頁首 */
+  header {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 6px; height: 100%;
+    background: linear-gradient(180deg, var(--primary), var(--accent));
+  }
+
+  .header-title h1 {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-title p {
+    font-size: 14px;
+    color: var(--text-sub);
+    margin-top: 4px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 10px;
+    background: #eceff1;
+    padding: 6px;
+    border-radius: 30px;
+  }
+  
+  .tab-btn {
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-sub);
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .tab-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 121, 107, 0.2);
+  }
+  
+  .tab-btn:hover:not(.active) {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-main);
+  }
+
+  /* 核心內容區架構 */
+  .tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  .tab-content.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 提示對話框 / 小助手 */
+  .assistant-bar {
+    background: var(--primary-light);
+    border-left: 5px solid var(--primary);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  }
+  .assistant-avatar {
+    font-size: 40px;
+    animation: bounce 2s infinite ease-in-out;
+  }
+  .assistant-text h4 {
+    color: var(--primary-dark);
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .assistant-text p {
+    font-size: 14px;
+    color: #37474f;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* 卡片基本樣式 */
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  /* ================== Tab 1: 課程首頁 ================== */
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 24px;
+  }
+  .intro-text h2 {
+    font-size: 28px;
+    color: var(--primary-dark);
+    margin-bottom: 16px;
+  }
+  .intro-text p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #455a64;
+    text-align: justify;
+  }
+  
+  .goals-list {
+    background: #f1f8e9;
+    border-radius: 16px;
+    padding: 20px;
+    border-left: 4px solid #8bc34a;
+    margin-bottom: 20px;
+  }
+  .goals-list h3 {
+    color: #33691e;
+    margin-bottom: 12px;
+    font-size: 17px;
+  }
+  .goals-list ul {
+    list-style: none;
+  }
+  .goals-list li {
+    font-size: 15px;
+    color: #558b2f;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .goals-list li input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #8bc34a;
+    cursor: pointer;
+  }
+
+  .intro-img-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+    border: 1px solid #e0e0e0;
+  }
+  .intro-img-container img {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    transition: var(--transition);
+  }
+  .intro-img-container img:hover {
+    transform: scale(1.02);
+  }
+  .intro-img-container span {
+    font-size: 12px;
+    color: var(--text-sub);
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* 紀年轉換小工具 */
+  .calc-tool {
+    background: var(--accent-light);
+    border: 1px solid #ffe0b2;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  .calc-tool h3 {
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .calc-box {
+    background: white;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .calc-box label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  .calc-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .calc-inputs input {
+    width: 80px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: bold;
+    text-align: center;
+  }
+  .calc-result {
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--primary);
+  }
+
+  /* ================== Tab 2: 歷史分期 ================== */
+  .timeline-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .timeline-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    border: 3px solid transparent;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .timeline-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 6px;
+  }
+  .timeline-card.t1::after { background: var(--period-early); }
+  .timeline-card.t2::after { background: var(--period-middle); }
+  .timeline-card.t3::after { background: var(--period-late); }
+
+  .timeline-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+  }
+  .timeline-card.active {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .timeline-card h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .timeline-card.t1 h3 { color: var(--period-early); }
+  .timeline-card.t2 h3 { color: var(--period-middle); }
+  .timeline-card.t3 h3 { color: var(--period-late); }
+  .timeline-card .years {
+    font-family: "Outfit", sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-sub);
+  }
+  .timeline-card .slogan-preview {
+    font-size: 12px;
+    background: rgba(0,0,0,0.04);
+    padding: 4px 8px;
+    border-radius: 20px;
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  /* 分期詳細說明內容 */
+  .period-detail {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+  }
+  .period-detail.active {
+    display: block;
+  }
+  .period-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 24px;
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 12px;
+  }
+  .badge.b-red { background: var(--period-early); }
+  .badge.b-gray { background: var(--period-middle); }
+  .badge.b-green { background: var(--period-late); }
+
+  .detail-section {
+    margin-bottom: 20px;
+  }
+  .detail-section h4 {
+    font-size: 18px;
+    color: var(--primary-dark);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .detail-section p {
+    font-size: 15px;
+    color: #37474f;
+    margin-bottom: 12px;
+    text-align: justify;
+  }
+
+  .sub-grid-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .key-events-list {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 4px solid var(--primary);
+    margin-top: 12px;
+  }
+  .key-events-list li {
+    list-style: none;
+    font-size: 14px;
+    margin-bottom: 8px;
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .key-events-list li::before {
+    content: '▪';
+    position: absolute;
+    left: 0; color: var(--primary);
+  }
+  .key-events-list b {
+    color: var(--primary-dark);
+  }
+
+  .period-media {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .media-box {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  }
+  .media-box img {
+    max-width: 100%;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto 8px;
+  }
+  .media-box span {
+    font-size: 12px;
+    color: var(--text-sub);
+    display: block;
+    line-height: 1.4;
+  }
+
+  /* ================== Tab 3: 機構與人物 ================== */
+  .figures-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  
+  .figure-item {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .figure-item:hover, .figure-item.active {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(0,121,107,0.15);
+  }
+  .figure-item img {
+    width: 80px;
+    height: 105px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #e0e0e0;
+  }
+  .figure-item h4 {
+    font-size: 14px;
+    color: var(--text-main);
+  }
+  .figure-item p {
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+
+  .figure-bio-box {
+    margin-top: 16px;
+    background: var(--primary-light);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    border-left: 6px solid var(--primary);
+    animation: fadeIn 0.4s;
+  }
+  .bio-photo img {
+    width: 100px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .bio-text {
+    flex-grow: 1;
+  }
+  .bio-text h3 {
+    color: var(--primary-dark);
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .bio-text .bio-title {
+    font-size: 13px;
+    background: var(--primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .bio-text p {
+    font-size: 14px;
+    color: #37474f;
+    text-align: justify;
+  }
+
+  /* 社會氛圍區排版 */
+  .propaganda-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .propaganda-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    box-shadow: var(--shadow);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .propaganda-card img {
+    height: 180px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
+  }
+  .propaganda-card h4 {
+    font-size: 16px;
+    color: var(--primary-dark);
+  }
+  .propaganda-card p {
+    font-size: 13px;
+    color: var(--text-sub);
+    text-align: justify;
+    line-height: 1.4;
+  }
+
+  /* ================== Tab 4: 挑戰遊戲 ================== */
+  .challenge-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+  }
+  .challenge-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    background: #f5f5f5;
+    border: 2px solid #e0e0e0;
+    transition: var(--transition);
+    min-width: 200px;
+  }
+  .challenge-step.unlocked {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .challenge-step.completed {
+    border-color: #43a047;
+    background: #e8f5e9;
+  }
+  .step-badge {
+    width: 32px; height: 32px;
+    background: #bdbdbd;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 15px;
+    font-family: 'Outfit', sans-serif;
+    flex-shrink: 0;
+    transition: var(--transition);
+  }
+  .challenge-step.unlocked .step-badge { background: var(--primary); }
+  .challenge-step.completed .step-badge { background: #43a047; }
+  .step-body { flex: 1; min-width: 0; }
+  .step-title { font-size: 13px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .step-pts { font-size: 11px; color: var(--text-sub); font-family: 'Outfit', sans-serif; }
+  .step-icon { font-size: 22px; flex-shrink: 0; }
+  .progress-connector {
+    font-size: 20px;
+    color: #bdbdbd;
+    flex-shrink: 0;
+    margin: 0 8px;
+    transition: var(--transition);
+  }
+  .progress-connector.done { color: #43a047; }
+
+  .c-game-panel { display: none; animation: fadeIn 0.4s ease-out; }
+  .c-game-panel.active { display: block; }
+
+  /* 遊戲頂部狀態 */
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+  .game-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--primary-dark);
+  }
+  .game-score-box {
+    font-size: 16px;
+    font-weight: bold;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  /* 遊戲一：時光重組 */
+  .timeline-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .timeline-slot-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .slot-year {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--primary-dark);
+    background: var(--primary-light);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .timeline-slot {
+    width: 100%;
+    height: 120px;
+    border: 2px dashed #b2dfdb;
+    border-radius: 12px;
+    background: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+    color: #999;
+    padding: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+  }
+  .timeline-slot.drag-over {
+    background: #e0f2f1;
+    border-color: var(--primary);
+    transform: scale(1.03);
+  }
+  .timeline-slot.filled {
+    border-style: solid;
+    border-color: var(--primary);
+    background: white;
+    color: var(--text-main);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  }
+  .timeline-slot.wrong {
+    border-color: #e53935;
+    background: #ffebee;
+    animation: shake 0.4s;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  .drag-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #f5f5f5;
+    padding: 16px;
+    border-radius: 12px;
+    min-height: 80px;
+    margin-bottom: 20px;
+  }
+  .drag-card {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: var(--transition);
+  }
+  .drag-card:active {
+    cursor: grabbing;
+  }
+  .drag-card.dragging {
+    opacity: 0.4;
+  }
+  .drag-card.placed {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+  .drag-card.selected-card {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    box-shadow: 0 0 10px rgba(255, 111, 0, 0.3);
+  }
+
+  .game-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+  .btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 14px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 15px rgba(0, 121, 107, 0.3);
+  }
+  .btn-secondary {
+    background: #eceff1;
+    color: var(--text-main);
+  }
+  .btn-secondary:hover {
+    background: #cfd8dc;
+  }
+
+  .game-message {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 14px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .game-message.success { color: #2e7d32; opacity: 1; }
+  .game-message.error { color: #c62828; opacity: 1; }
+
+  /* 遊戲二：對對碰 */
+  .slogan-game-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .slogan-bins {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .slogan-bin {
+    border: 2px dashed #b0bec5;
+    border-radius: 16px;
+    padding: 16px;
+    background: #fafafa;
+    min-height: 120px;
+    transition: var(--transition);
+  }
+  .slogan-bin.drag-over {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .slogan-bin h3 {
+    font-size: 15px;
+    margin-bottom: 12px;
+    color: var(--text-main);
+  }
+  .slogan-bin.b1 h3 { color: var(--period-early); }
+  .slogan-bin.b2 h3 { color: var(--period-late); }
+
+  .slogan-bin .bin-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .bin-chip {
+    background: white;
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+  }
+  .bin-chip.c1 { border-color: var(--period-early); color: var(--period-early); background: var(--period-early-light); }
+  .bin-chip.c2 { border-color: var(--period-late); color: var(--period-late); background: var(--period-late-light); }
+
+  /* 遊戲三：翻牌配對 */
+  .flip-game-container {
+    max-width: 600px;
+    margin: 0 auto 20px;
+  }
+  .flip-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .flip-card-wrapper {
+    height: 150px;
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .flip-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .flip-card-wrapper:hover .flip-card {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+  .flip-card.flipped {
+    transform: rotateY(180deg);
+  }
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+    box-shadow: var(--shadow);
+    border: 2px solid white;
+  }
+  .card-back {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+  }
+  .card-front {
+    background: white;
+    color: var(--text-main);
+    font-size: 12px;
+    font-weight: bold;
+    transform: rotateY(180deg);
+  }
+  .card-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  .flip-card.matched .card-front {
+    border-color: #43a047;
+    background: #e8f5e9;
+    color: #2e7d32;
+    opacity: 0.8;
+  }
+  .flip-card.matched {
+    pointer-events: none;
+  }
+
+  /* 評分檢查點彈窗 + 學生資訊彈窗 */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+  }
+  .modal-box {
+    background: white;
+    border-radius: 20px;
+    padding: 32px 28px;
+    max-width: 440px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    animation: popIn 0.35s ease-out;
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .modal-box h2 { font-size: 24px; color: var(--primary-dark); margin-bottom: 12px; }
+  .modal-box .result-text { font-size: 15px; color: #455a64; margin-bottom: 20px; line-height: 1.6; }
+  .modal-box .result-score { font-size: 40px; font-weight: 900; color: var(--accent); font-family: 'Outfit', sans-serif; margin: 8px 0 16px; }
+  .modal-box .retry-question { font-size: 15px; color: #546e7a; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  
+  .student-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .student-form-grid div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .student-form-grid label {
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--text-sub);
+  }
+  .student-form-grid input, .student-form-grid select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+  }
+
+  /* Cert popup (wider, gold-bordered) */
+  .cert-popup {
+    max-width: 560px;
+    background: linear-gradient(135deg, #fffef5 0%, #faf6ed 100%);
+    border: 3px solid #d4a853;
+    position: relative;
+  }
+  .cert-popup::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 2px solid #c9a95c;
+    border-radius: 12px;
+    pointer-events: none;
+  }
+  .cert-popup::after {
+    content: '';
+    position: absolute;
+    inset: 14px;
+    border: 1px solid #d4a853;
+    border-radius: 10px;
+    pointer-events: none;
+  }
+  .cert-popup h2 { color: #4e342e; font-size: 30px; }
+  .cert-popup .cert-subtitle { font-size: 14px; color: #6d4c41; margin: 6px 0 18px; line-height: 1.6; }
+  .cert-popup .cert-scores {
+    background: white;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    border: 1px solid #efe0c0;
+  }
+  .cert-popup .cert-score-row {
+    display: flex; justify-content: space-between; padding: 6px 0;
+    border-bottom: 1px solid #f5ecd7; font-size: 13px;
+  }
+  .cert-popup .cert-score-total {
+    display: flex; justify-content: space-between; padding: 10px 0 0;
+    margin-top: 6px; border-top: 2px solid #d4a853; font-size: 16px; font-weight: 900;
+  }
+  .cert-popup .cert-total-pts {
+    color: var(--accent); font-family: 'Outfit', sans-serif; font-size: 24px;
+  }
+  .cert-popup .cert-date { font-size: 12px; color: #8d6e63; margin-bottom: 12px; }
+
+  /* ================== Tab 5: 總複習表 ================== */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    background: white;
+  }
+  .summary-table th, .summary-table td {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 14px;
+  }
+  .summary-table th {
+    background: var(--primary-dark);
+    color: white;
+    font-weight: bold;
+  }
+  .summary-table tr {
+    border-bottom: 1px solid #eee;
+  }
+  .summary-table tr:last-child {
+    border-bottom: none;
+  }
+  .summary-table tr:nth-child(even) {
+    background: #fafafa;
+  }
+  .summary-table td b {
+    color: var(--primary-dark);
+  }
+
+  .print-header-area {
+    display: none;
+  }
+
+  /* 螢幕彩帶 Canvas */
+  #canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ================== 響應式斷點 (900px) ================== */
+  @media (max-width: 900px) {
+    .intro-grid, .period-layout, .slogan-game-layout {
+      grid-template-columns: 1fr;
+    }
+    .timeline-slots-grid {
+      grid-template-columns: repeat(3, 2fr);
+    }
+    .figures-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .propaganda-section {
+      grid-template-columns: 1fr;
+    }
+    .flip-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    header {
+      flex-direction: column;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .tabs {
+      width: 100%;
+      overflow-x: auto;
+    }
+  }
+
+  /* ================== 列印樣式 ================== */
+  @media print {
+    body {
+      background: white !important;
+      color: black !important;
+      font-size: 12pt;
+    }
+    .container {
+      width: 100%;
+      max-width: none;
+      padding: 0;
+    }
+    /* 隱藏所有網頁互動導航、提示列、遊戲及彈窗 */
+    header, .tabs, .assistant-bar, .controls-bar,
+    .challenge-progress, .c-game-panel, .timeline-nav,
+    .figures-grid, .figure-bio-box, .propaganda-section,
+    .modal-overlay, #canvas, .calc-tool, .intro-grid, .btn {
+      display: none !important;
+    }
+    /* 顯示學習單專用標題與作答欄 */
+    .print-header-area {
+      display: block !important;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+    }
+    .print-title {
+      font-size: 20pt;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .print-fields {
+      display: flex;
+      justify-content: space-around;
+      font-size: 12pt;
+      font-weight: bold;
+    }
+    /* 僅顯示總複習 Tab */
+    .tab-content { display: none !important; }
+    #summaryTab {
+      display: block !important;
+    }
+    .summary-table {
+      box-shadow: none;
+      border: 1px solid black !important;
+      margin-top: 15px;
+    }
+    .summary-table th {
+      background: #333 !important;
+      color: white !important;
+      border: 1px solid black !important;
+    }
+    .summary-table td {
+      border: 1px solid black !important;
+      background: white !important;
+      color: black !important;
+    }
+    .summary-table tr {
+      page-break-inside: avoid;
+    }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<!-- 學生基本資訊彈窗 -->
+<div class="modal-overlay" id="studentModal" style="display: none;">
+  <div class="modal-box">
+    <h2>📝 請輸入學習個人資訊</h2>
+    <p class="result-text">開始挑戰前，請填寫以下個人資訊，以便將通關分數記錄到班級成績單中。</p>
+    <div class="student-form-grid">
+      <div>
+        <label for="studentGrade">年級</label>
+        <select id="studentGrade">
+          <option value="7">七年級</option>
+          <option value="8">八年級</option>
+          <option value="9">九年級</option>
+        </select>
+      </div>
+      <div>
+        <label for="studentClass">班級 (例如: 1班填1)</label>
+        <input type="number" id="studentClass" min="1" max="30" placeholder="班">
+      </div>
+      <div>
+        <label for="studentSeat">座號</label>
+        <input type="number" id="studentSeat" min="1" max="50" placeholder="號">
+      </div>
+      <div>
+        <label for="studentName">學生姓名</label>
+        <input type="text" id="studentName" placeholder="請輸入姓名">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="studentStartBtn">開始挑戰 ➔</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  
+  <!-- 頁首與 Tab 導航 -->
+  <header>
+    <div class="header-title">
+      <h1>🇹🇼 第四章 戰後臺灣的政治</h1>
+      <p>國中歷史學習平台 • 威權體制到政治民主化歷程</p>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="introTab">🏠 首頁</button>
+      <button class="tab-btn" data-tab="timelineTab">⏳ 歷史分期</button>
+      <button class="tab-btn" data-tab="agencyTab">🏛️ 人物與氛圍</button>
+      <button class="tab-btn" data-tab="summaryTab">📊 總複習表</button>
+      <button class="tab-btn" data-tab="gameTab">🎮 挑戰遊戲</button>
+    </div>
+  </header>
+
+  <!-- 小助手提示列 -->
+  <div class="assistant-bar">
+    <div class="assistant-avatar">🐻</div>
+    <div class="assistant-text">
+      <h4 id="assistantTitle">黑熊小助手提示</h4>
+      <p id="assistantDesc">歡迎來到第四章「戰後臺灣的政治」學習網頁！本課將帶領你認識臺灣如何從光復初期的衝突與威權戒嚴體制，一步步走向自由多元的民主時代。點擊上方分頁按鈕開始探索吧！</p>
+    </div>
+  </div>
+
+  <!-- ================== Tab 1: 課程首頁 ================== -->
+  <div class="tab-content active" id="introTab">
+    <div class="intro-grid">
+      <div class="intro-text-area">
+        <div class="card">
+          <h2 class="card-title">📖 單元引言</h2>
+          <p>第二次世界大戰結束後，臺灣與澎湖由中華民國接收與治理。戰後初期，由於治臺大權集聚、民生凋敝及社會隔閡，最終引爆了二二八事件。隨後政府為了因應國共內戰，實施了長達 38 年的戒嚴並建立動員戡亂體制，限制了基本人權，造成「白色恐怖」。</p>
+          <p>然而，無數臺灣人民長年不屈不撓地爭取人權與民主自由，突破了威權體制的束縛，促成政府於民國 76 年解嚴、終止動員戡亂。歷經修憲與總統民選，政黨輪替已成為常態，這得來不易的民主化成果，值得我們深思與珍惜。</p>
+        </div>
+        
+        <div class="goals-list">
+          <h3>🎯 本課核心學習目標</h3>
+          <ul>
+            <li onclick="toggleCheckbox('gCheckbox1')"><input type="checkbox" id="gCheckbox1"> 理解以不同的紀年與分期描述戰後歷史變遷</li>
+            <li onclick="toggleCheckbox('gCheckbox2')"><input type="checkbox" id="gCheckbox2"> 覺察二二八事件的起因、經過、鎮壓與其深遠影響</li>
+            <li onclick="toggleCheckbox('gCheckbox3')"><input type="checkbox" id="gCheckbox3"> 審視戒嚴與白色恐怖時期的權利侵害與國家暴力</li>
+            <li onclick="toggleCheckbox('gCheckbox4')"><input type="checkbox" id="gCheckbox4"> 掌握民主運動推動解嚴、廢除臨時條款的民主化歷程</li>
+            <li onclick="toggleCheckbox('gCheckbox5')"><input type="checkbox" id="gCheckbox5"> 省思轉型正義在尋求真相、彌補傷痕上的價值</li>
+          </ul>
+        </div>
+        
+        <!-- 紀年轉換工具 -->
+        <div class="calc-tool">
+          <h3>📅 紀年轉換小助手</h3>
+          <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;">民國與西元紀年的快速轉換，幫助你與世界歷史接軌！</p>
+          <div class="calc-grid">
+            <div class="calc-box">
+              <label for="inputMinguo">民國年轉西元年</label>
+              <div class="calc-inputs">
+                <span>民國</span>
+                <input type="number" id="inputMinguo" min="1" placeholder="36" oninput="convertMinguoToWestern()">
+                <span>年</span>
+              </div>
+              <span class="calc-result" id="resultWestern">➔ 西元 1947 年</span>
+            </div>
+            
+            <div class="calc-box">
+              <label for="inputWestern">西元年轉民國年</label>
+              <div class="calc-inputs">
+                <span>西元</span>
+                <input type="number" id="inputWestern" min="1912" placeholder="1987" oninput="convertWesternToMinguo()">
+                <span>年</span>
+              </div>
+              <span class="calc-result" id="resultMinguo">➔ 民國 76 年</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="period-media">
+        <div class="intro-img-container">
+          <img src="images/l04_clean/event_taiwan_retrocession.jpg" alt="受降典禮">
+          <span><b>受降典禮於臺北公會堂舉行 (民國34年10月25日)</b><br>二戰日本投降，中華民國接收臺灣與澎湖，定此日為「臺灣光復節」</span>
+        </div>
+        <div class="intro-img-container">
+          <img src="images/l04_clean/chart_civil_servants.png" alt="籍別比例">
+          <span><b>戰後初期行政長官公署高階公職籍別比例圖</b><br>外省籍達 75%，本地臺籍僅 25%，引發行政資源分配不公之不滿</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== Tab 2: 歷史分期 ================== -->
+  <div class="tab-content" id="timelineTab">
+    
+    <div class="timeline-nav">
+      <div class="timeline-card active t1" data-period="period1">
+        <h3>1. 戰後初期與二二八</h3>
+        <span class="years">1945 ~ 1947</span>
+        <span class="slogan-preview">光復節與清鄉</span>
+      </div>
+      <div class="timeline-card t2" data-period="period2">
+        <h3>2. 戒嚴與白色恐怖</h3>
+        <span class="years">1948 ~ 1987</span>
+        <span class="slogan-preview">限制自由與特務侵害</span>
+      </div>
+      <div class="timeline-card t3" data-period="period3">
+        <h3>3. 民主化與民主時代</h3>
+        <span class="years">1987 ~ 至今</span>
+        <span class="slogan-preview">解嚴、學運與政黨輪替</span>
+      </div>
+    </div>
+
+    <!-- 階段一 -->
+    <div class="period-detail active" id="period1">
+      <div class="period-layout">
+        <div class="card">
+          <span class="badge b-red">戰後初期與二二八事件 (1945~1947)</span>
+          <div class="detail-section">
+            <h4>🚨 戰後初期的統治危機</h4>
+            <p><b>政治專制與貪腐：</b> 戰後初期成立「臺灣省行政長官公署」，長官<b>陳儀</b>集軍政大權於一身，類似日治時期的總督專制。公職人員任用不均，高階官員多為中國大陸來臺人士，且部分軍警官員貪汙特權，令臺民極度失望。</p>
+            <p><b>物價飛漲與物資短缺：</b> 政府實施專賣與經濟管制，加上米糧大量被運往大陸支援國共內戰，造成米荒，物價大幅上漲，民不聊生。</p>
+            <p><b>社會與文化隔閡：</b> 兩岸分隔 50 年，在語言、法治觀念與生活習慣上皆有極大落差。例如：靠左走改為靠右走等規範適應，以及生活習慣上的誤解，加深了彼此的隔閡。</p>
+          </div>
+          
+          <div class="detail-section">
+            <h4>💥 二二八事件經過與清鄉國家暴力</h4>
+            <p><b>事件爆發：</b> 民國36年2月27日，專賣局查緝員於臺北市延平北路查緝私菸時，誤傷民眾並開槍打死無辜百姓。28日起，衝突蔓延全省。地方人士組成「二二八事件處理委員會」試圖重組政治改革、平息動亂。</p>
+            <p><b>國家暴力與清鄉：</b> 陳儀暗中請求中央派兵增援。3月8日國軍登陸進行強制鎮壓，並隨後展開「清鄉」（清查戶口、搜繳武器）。在過程中大量槍決異議人士、知識分子（如畫家陳澄波），造成許多無辜受難者，留下難以撫平的歷史傷痕與族群裂痕。</p>
+          </div>
+        </div>
+        
+        <div class="period-media">
+          <div class="media-box">
+            <img src="images/l04_clean/map_228_suppression.png" alt="二二八鎮壓路線">
+            <span><b>二二八事件爆發後國軍增援鎮壓路線圖</b><br>軍隊登陸基隆與高雄後，迅速向全臺展開強力軍事鎮壓</span>
+          </div>
+          <div class="media-box">
+            <img src="images/l04_clean/chart_inflation.png" alt="米價飆升">
+            <span><b>1946-1947年間米與民生物資價格大幅飆升統計</b><br>惡性通貨膨脹導致民怨一觸即發，成為二二八事件的社會導火線</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 階段二 -->
+    <div class="period-detail" id="period2">
+      <div class="period-layout">
+        <div class="card">
+          <span class="badge b-gray">戒嚴體制與白色恐怖時代 (1948~1987)</span>
+          <div class="detail-section">
+            <h4>🛡️ 動員戡亂與戒嚴令的發布</h4>
+            <p>為了防範共產黨滲透並準備國共內戰，政府於民國37年制定《<b>動員戡亂時期臨時條款</b>》，凍結憲法中對總統任期的限制（擴大總統職權）。</p>
+            <p>民國38年（1949）5月，臺灣省警備總司令部發布《<b>臺灣省戒嚴令</b>》，限制憲法賦予人民的言論、出版、集會、結社自由。同年底政府退守臺灣，開啟長達 38 年的戒嚴生活。</p>
+          </div>
+          
+          <div class="detail-section">
+            <h4>👁️ 白色恐怖與特務系統侵害人權</h4>
+            <p><b>白色恐怖的實施：</b> 政府為鞏固統治，濫用國家公權力，依靠嚴密的特務系統（警備總部），未依正常法律程序便逮捕受難者。許多人未經公開、公正的司法審判即遭定罪，造成人人自危的防諜恐怖社會。</p>
+            <p><b>原住民菁英遭害：</b> 鄒族菁英高一生（日治接受高等教育，戰後熱心服務地方）於民國41年因爭取原住民自治與權利，被政府誣以「匪諜集會叛亂」逮捕並於兩年後執行死刑，是國家暴力侵害人權的鐵證。</p>
+            <p><b>綠島新生訓導處：</b> 威權政府於綠島設立集中改造機構，強行收容各地逮捕的政治犯（包括女性政治犯），進行思想灌輸與監禁。</p>
+          </div>
+        </div>
+        
+        <div class="period-media">
+          <div class="media-box">
+            <img src="images/l04_clean/document_martial_law.jpg" alt="戒嚴令">
+            <span><b>臺灣省警備總司令部佈告的「戒嚴令」（民國38年）</b><br>嚴格限制人民集會遊行、散佈謠言，宵禁管制並隨身攜帶身分證</span>
+          </div>
+          <div class="media-box">
+            <img src="images/l04_clean/portrait_gao_yi_sheng.jpg" alt="高一生肖像">
+            <span><b>鄒族領袖高一生（日治早期接受現代教育原住民菁英）</b><br>戰後致力於改善族人經濟，因爭取權益於白色恐怖時期遭槍決</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 階段三 -->
+    <div class="period-detail" id="period3">
+      <div class="period-layout">
+        <div class="card">
+          <span class="badge b-green">政治民主化與民主時代 (1987~至今)</span>
+          <div class="detail-section">
+            <h4>💪 不斷挑戰威權與解嚴</h4>
+            <p><b>地方自治萌芽：</b> 民國39年起，政府為宣傳民主實行地方自治，開放基層縣議員和市長選舉，雖然高層仍由官方指派，但為民主運動奠立了選戰經驗基礎。</p>
+            <p><b>雷震事件（1960）：</b> 雷震與自由中國雜誌成員寫文章反對蔣中正連任並嘗試組織「中國民主黨」，遭到逮捕與壓制。</p>
+            <p><b>美麗島事件（1979）：</b> 民國68年在高雄爆發國際人權日衝突，多名「黨外」人士被捕並面臨軍法大審。美麗島大審的法庭辯護使臺灣人更加覺醒。民國75年，黨外人士突破黨禁，成立「民主進步黨」。</p>
+            <p><b>宣告解嚴（1987）：</b> 蔣經國總統順應大勢，於民國76年7月宣布解除戒嚴，開放黨禁與報禁，臺灣政局大幅跨入自由時代。</p>
+          </div>
+          
+          <div class="detail-section">
+            <h4>🌸 廢除臨時條款與總統直選</h4>
+            <p><b>野百合學運（1990）：</b> 民國79年，數千名學生在中正紀念堂廣場靜坐，以臺灣野百合為象徵，提出廢除臨時條款、國會全面改選等訴求。李登輝總統順應修憲，於民國80年廢除《動員戡亂時期臨時條款》，萬年國會走入歷史。</p>
+            <p><b>人民直選與政黨輪替：</b> 民國85年實行第一次總統直接選舉，由李登輝當選。此後透過選舉制度，政黨輪替已成為常態（陳水扁、馬英九、蔡英文、賴清德相繼執政），臺灣成為成熟民主國家。</p>
+          </div>
+        </div>
+        
+        <div class="period-media">
+          <div class="media-box">
+            <img src="images/l04_clean/event_wild_lily.jpg" alt="野百合學運">
+            <span><b>三月學運現場矗立的巨大野百合意象（民國79年）</b><br>象徵學生的自主性與草根性，順利促成廢除臨時條款與國會改革</span>
+          </div>
+          <div class="media-box">
+            <img src="images/l04_clean/propaganda_presidential_election.jpg" alt="首次總統直選">
+            <span><b>民國85年第九屆總統選舉（首次全民直接選舉）文宣</b><br>李登輝與連戰搭檔競選海報，是臺灣主權在民的劃時代里程碑</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================== Tab 3: 人物與氛圍 ================== -->
+  <div class="tab-content" id="agencyTab">
+    <div class="card">
+      <h2>🏛️ 重要歷史人物生平輪播</h2>
+      <p style="color: var(--text-sub); font-size: 14px; margin-bottom: 12px;">點選以下歷史人物，了解他們在戰後臺灣政治變遷中所扮演的關鍵角色！</p>
+      
+      <div class="figures-grid">
+        <div class="figure-item active" data-bio="c1">
+          <img src="images/l04_clean/portrait_chen_cheng_po.jpg" alt="陳澄波">
+          <h4>陳澄波</h4>
+          <p>畫家/二二八受難者</p>
+        </div>
+        <div class="figure-item" data-bio="c2">
+          <img src="images/l04_clean/portrait_gao_yi_sheng.jpg" alt="高一生">
+          <h4>高一生</h4>
+          <p>鄒族領袖/白色恐怖</p>
+        </div>
+        <div class="figure-item" data-bio="c3">
+          <img src="images/l04_clean/portrait_lei_zhen.jpg" alt="雷震">
+          <h4>雷震</h4>
+          <p>自由中國/反對黨籌組</p>
+        </div>
+        <div class="figure-item" data-bio="c4">
+          <img src="images/l04_clean/stamp_local_autonomy.jpg" alt="陳儀">
+          <h4>陳儀</h4>
+          <p>行政長官/集權統治</p>
+        </div>
+        <div class="figure-item" data-bio="c5">
+          <img src="images/l04_clean/portrait_chiang_ching_kuo.jpg" alt="蔣經國">
+          <h4>蔣經國</h4>
+          <p>發布解嚴總統</p>
+        </div>
+        <div class="figure-item" data-bio="c6">
+          <img src="images/l04_clean/propaganda_presidential_election.jpg" alt="李登輝">
+          <h4>李登輝</h4>
+          <p>民主改革/總統直選</p>
+        </div>
+      </div>
+
+      <!-- 生平詳細內容卡片 -->
+      <div class="figure-bio-box">
+        <div class="bio-photo">
+          <img id="bioImg" src="images/l04_clean/portrait_chen_cheng_po.jpg" alt="肖像">
+        </div>
+        <div class="bio-text">
+          <h3 id="bioName">陳澄波</h3>
+          <span class="bio-title" id="bioTitle">生卒年：西元 1895～1947 年</span>
+          <p id="bioDesc">日治時期首位入選帝國美術展覽會的臺灣西畫家。二二八事件爆發後，他身為嘉義市「二二八事件處理委員會」的代表之一，抱持著愛護鄉里的熱忱與軍隊進行和平協商。然而不幸遭到軍隊逮捕，並在未經司法審判的情況下在嘉義火車站前被公開槍決，為歷史留下了無法彌補的遺憾。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 戒嚴時期社會氛圍 -->
+    <div class="card">
+      <h2>🗣️ 反共愛國——戒嚴時期的社會風貌</h2>
+      <p style="color: var(--text-sub); font-size: 14px; margin-bottom: 16px;">戒嚴時期，政府的反共宣傳與愛國教育深入人民的生活，塑造出緊繃與效忠的氛圍。</p>
+      
+      <div class="propaganda-section">
+        <div class="propaganda-card">
+          <img src="images/l04_clean/propaganda_anti_communist.jpg" alt="保密防諜">
+          <h4>🔍 「保密防諜，人人有責」</h4>
+          <p>民國40年代，工廠、學校和政府機關充斥著小心匪諜的圖畫與宣傳標語。告誡人民不能任意談論工作、如發現言行怪異的人要向安全單位密告，嚴重限縮了人民生活與言論空間。</p>
+        </div>
+        <div class="propaganda-card">
+          <img src="images/l04_clean/propaganda_patriotic_songs.jpg" alt="愛國歌曲">
+          <h4>🎵 查禁歌曲與愛國歌曲推廣</h4>
+          <p>政府透過新聞局審查，查禁被冠上「為匪宣傳」或「靡靡之音」的歌曲。另外大力推廣《臺灣好》、《梅花》與《中華民國頌》等愛國歌曲（淨化歌曲），規定歌星須演唱淨化歌曲才能保留歌星證。</p>
+        </div>
+        <div class="propaganda-card">
+          <img src="images/l04_clean/propaganda_patriotic_movie.jpg" alt="八百壯士海報">
+          <h4>🎬 愛國電影與處變不驚</h4>
+          <p>在面臨退出聯合國與中美斷交的外交挫折下，政府資助拍攝大量激勵愛國情操的電影（如《梅花》、《八百壯士》），以歷史戰爭抗日事件宣傳「莊敬自強、處變不驚」的民族精神。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== Tab 4: 總複習表 ================== -->
+  <div class="tab-content" id="summaryTab">
+    
+    <!-- 僅在列印時顯示的標題區 -->
+    <div class="print-header-area">
+      <div class="print-title">國中社會七年級歷史學習單：戰後臺灣的政治演變</div>
+      <div class="print-fields">
+        <span>年級：七年 ＿＿ 班</span>
+        <span>座號：＿＿ 號</span>
+        <span>姓名：＿＿＿＿＿＿</span>
+        <span>分數：＿＿＿＿＿＿</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2>📊 戰後臺灣政治體制演變總對照</h2>
+        <button class="btn btn-primary" onclick="window.print()">🖨️ 列印 / 儲存為複習學習單</button>
+      </div>
+      <p style="color: var(--text-sub); font-size: 14px; margin-bottom: 16px;">
+        本表整理了戰後臺灣政治的三個核心階段。點選「列印/儲存」按鈕，可以將本對照表直接以 A4 紙張格式列印成實體學習單喔！
+      </p>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th style="width: 15%;">維度 / 階段</th>
+            <th style="width: 28%;">一、戰後初期 (1945~1947)</th>
+            <th style="width: 28%;">二、戒嚴與威權體制 (1949~1987)</th>
+            <th style="width: 29%;">三、民主時代 (1987~至今)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>治臺機構</b></td>
+            <td>臺灣省行政長官公署（陳儀執政，集行政、軍事、立法大權於一身）</td>
+            <td>臺灣省政府取代行政長官公署；特務機關（如警備總部）運用強權控制社會</td>
+            <td>行政院陸委會、海基會（民間委託機構）負責兩岸事務；回歸正常民主政府體制</td>
+          </tr>
+          <tr>
+            <td><b>核心法律</b></td>
+            <td>一般中華民國法律</td>
+            <td><b>動員戡亂時期臨時條款</b>（擴大總統權力）、<b>臺灣省戒嚴令</b>（限制公民自由）</td>
+            <td>廢除臨時條款與終止動員戡亂；進行多次<b>修憲</b>以落實民主化</td>
+          </tr>
+          <tr>
+            <td><b>基本人權</b></td>
+            <td>治臺失當、物價飛漲與隔閡，引爆二二八事件，隨後軍事鎮壓清鄉傷害人權</td>
+            <td><b>白色恐怖案件：</b> 濫用公權力與特務抓人，侵害言論、集會、結社與出版自由</td>
+            <td>解除戒嚴、開放黨禁報禁；保障人民享有完整憲法基本人權與言論自由</td>
+          </tr>
+          <tr>
+            <td><b>選舉範圍</b></td>
+            <td>尚未實施地方自治</td>
+            <td><b>部分地方自治：</b> 僅實行基層縣市長與議員選舉，省主席、直轄市長皆官方指派，中央無全面選舉</td>
+            <td>中央民代全面改選（終結萬年國會）；民國85年實行<b>總統民選</b>；政黨輪替常態化</td>
+          </tr>
+          <tr>
+            <td><b>代表受難與挑戰人物</b></td>
+            <td><b>陳澄波：</b> 畫家，擔任二二八談判代表遭逮捕並槍決</td>
+            <td><b>高一生：</b> 鄒族領袖，被控叛亂槍決；<b>雷震：</b> 創辦自由中國挑戰黨禁被捕</td>
+            <td><b>美麗島人士：</b> 美麗島事件促成後續民進黨成立；<b>野百合學生：</b> 推動民主政治改革</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 20px; font-size: 13px; color: var(--text-sub);">
+        <p><b>✍️ 學習思考區（請於列印後的實體紙張上填寫）：</b></p>
+        <p style="margin-top: 8px;">1. 戰後初期臺灣人對回歸懷抱希望，最終卻引爆二二八事件，你認為最主要的起因為何？</p>
+        <p style="margin-top: 30px; border-bottom: 1px dashed #ccc; height: 20px;"></p>
+        <p style="margin-top: 12px;">2. 白色恐怖鄒族領袖高一生案給了我們在面對「國家暴力與人權保護」上什麼樣的歷史反思？</p>
+        <p style="margin-top: 30px; border-bottom: 1px dashed #ccc; height: 20px;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== Tab 5: 挑戰遊戲 ================== -->
+  <div class="tab-content" id="gameTab">
+    
+    <!-- 依序通關進度條 -->
+    <div class="challenge-progress">
+      <div class="challenge-step unlocked" id="cStep1">
+        <div class="step-badge">1</div>
+        <div class="step-body">
+          <div class="step-title">時光重組 (排序)</div>
+          <div class="step-pts">滿分 30 分</div>
+        </div>
+        <div class="step-icon" id="cIcon1">🔓</div>
+      </div>
+      <div class="progress-connector" id="cConn1">➔</div>
+      
+      <div class="challenge-step" id="cStep2">
+        <div class="step-badge">2</div>
+        <div class="step-body">
+          <div class="step-title">體制規範對對碰</div>
+          <div class="step-pts">滿分 30 分</div>
+        </div>
+        <div class="step-icon" id="cIcon2">🔒</div>
+      </div>
+      <div class="progress-connector" id="cConn2">➔</div>
+      
+      <div class="challenge-step" id="cStep3">
+        <div class="step-badge">3</div>
+        <div class="step-body">
+          <div class="step-title">人物事蹟翻翻樂</div>
+          <div class="step-pts">滿分 40 分</div>
+        </div>
+        <div class="step-icon" id="cIcon3">🔒</div>
+      </div>
+    </div>
+
+    <!-- 遊戲一：時光重組 -->
+    <div class="c-game-panel active" id="cGame1">
+      <div class="card">
+        <div class="game-header">
+          <span class="game-title">📅 第一關：戰後政治大事時光重組 (拖曳排序)</span>
+          <span class="game-score-box">得分：<span id="g1Score" style="font-family: 'Outfit';">0</span> / 30 分</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px;">
+          <b>規則：</b>請把下方打亂的關鍵政治事件，依照歷史發生的時間順序（從早到晚，西元1947➔1987），拖曳到對應的年代格子中。若使用平板，可先點擊事件卡，再點擊年代格放入。
+        </p>
+        
+        <div class="timeline-slots-grid" id="tSlots">
+          <!-- JS 動態生成 -->
+        </div>
+
+        <div class="drag-pool" id="tPool">
+          <!-- JS 動態生成打亂卡片 -->
+        </div>
+
+        <div class="game-actions">
+          <button class="btn btn-secondary" onclick="resetGame1()">🔄 重新整理</button>
+          <button class="btn btn-primary" onclick="checkGame1()">✓ 送出檢查</button>
+        </div>
+        <div class="game-message" id="g1Msg"></div>
+      </div>
+    </div>
+
+    <!-- 遊戲二：對對碰 -->
+    <div class="c-game-panel" id="cGame2" style="display: none;">
+      <div class="card">
+        <div class="game-header">
+          <span class="game-title">💬 第二關：戒嚴威權 vs. 民主自由體制對對碰</span>
+          <span class="game-score-box">得分：<span id="g2Score" style="font-family: 'Outfit';">0</span> / 30 分</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px;">
+          <b>規則：</b>下方共有 6 個生活與政治規範標籤。請將它們分類，拖曳到右側對應的「戒嚴威權體制」或「民主自由體制」盒子中。點選左側標籤再點選右側盒子亦可。
+        </p>
+        
+        <div class="slogan-game-layout">
+          <div class="drag-pool" id="sPool" style="min-height: 280px; align-content: flex-start;">
+            <!-- JS 動態生成 -->
+          </div>
+          
+          <div class="slogan-bins">
+            <div class="slogan-bin b1" data-cat="authoritarian">
+              <h3>🚨 戒嚴威權體制下（禁止、限制或防諜活動）</h3>
+              <div class="bin-items" id="binAuth"></div>
+            </div>
+            
+            <div class="slogan-bin b2" data-cat="democratic">
+              <h3>🗳️ 民主自由體制下（人民合法享有的權利或改革）</h3>
+              <div class="bin-items" id="binDemo"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-actions">
+          <button class="btn btn-secondary" onclick="resetGame2()">🔄 重新整理</button>
+          <button class="btn btn-primary" onclick="checkGame2()">✓ 送出檢查</button>
+        </div>
+        <div class="game-message" id="g2Msg"></div>
+      </div>
+    </div>
+
+    <!-- 遊戲三：翻牌配對 -->
+    <div class="c-game-panel" id="cGame3" style="display: none;">
+      <div class="card">
+        <div class="game-header">
+          <span class="game-title">🃏 第三關：歷史人物與事蹟翻翻樂 (3D 記憶翻牌)</span>
+          <span class="game-score-box">配對進度：<span id="g3MatchCount" style="font-family: 'Outfit';">0</span> / 4 對 (滿分 40 分)</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px;">
+          <b>規則：</b>下方共有 8 張覆蓋的卡片。點擊卡片翻開，找出「歷史人物肖像/名稱」與其「對應的歷史事蹟說明」進行配對。每配對成功一對可獲得 10 分！
+        </p>
+        
+        <div class="flip-game-container">
+          <div class="flip-grid" id="fGrid">
+            <!-- JS 動態生成卡片 -->
+          </div>
+        </div>
+
+        <div class="game-actions">
+          <button class="btn btn-secondary" onclick="resetGame3()">🔄 重新洗牌</button>
+        </div>
+        <div class="game-message" id="g3Msg"></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ====== Firebase 初始化 ======
+const firebaseConfig = {
+  apiKey: "AIzaSyBnIkk08DpjkkQDeSOusaM8GWqAqmDqqGA",
+  authDomain: "tscpsystem.firebaseapp.com",
+  databaseURL: "https://tscpsystem-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "tscpsystem",
+  storageBucket: "tscpsystem.firebasestorage.app",
+  messagingSenderId: "246550546781",
+  appId: "1:246550546781:web:d26a020eb05f3a25fa40b4",
+  measurementId: "G-18HH2Q1CY6"
+};
+let db = null;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+} catch (e) {
+  console.warn('Firebase 初始化失敗：', e);
+}
+
+const CHAPTER_CODE = 'L04';
+const CHAPTER_TITLE = '戰後臺灣的政治';
+
+// 取得與儲存學生基本資訊
+function getStudentInfo() {
+  try {
+    return JSON.parse(localStorage.getItem('l04_student_info') || 'null');
+  } catch (e) { return null; }
+}
+function saveStudentInfo(classId, name) {
+  localStorage.setItem('l04_student_info', JSON.stringify({ classId, name }));
+}
+function showStudentModalIfNeeded() {
+  const info = getStudentInfo();
+  if (info && info.classId && info.name) return true;
+  const modal = document.getElementById('studentModal');
+  if (modal) modal.style.display = '';
+  return false;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const startBtn = document.getElementById('studentStartBtn');
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      const grade = (document.getElementById('studentGrade').value || '').trim();
+      const cls   = (document.getElementById('studentClass').value || '').trim();
+      const seat  = (document.getElementById('studentSeat').value || '').trim();
+      const name  = (document.getElementById('studentName').value || '').trim();
+      if (!grade || !cls || !seat || !name) {
+        alert('請完整填寫年級、班、座號與姓名');
+        return;
+      }
+      const classId = `${grade}${cls}-${seat}`;
+      saveStudentInfo(classId, name);
+      const modal = document.getElementById('studentModal');
+      if (modal) modal.style.display = 'none';
+    });
+  }
+  // 初始化遊戲一
+  initGame1();
+});
+
+// 學習目標多選框連動點擊
+function toggleCheckbox(id) {
+  const box = document.getElementById(id);
+  if (box) {
+    box.checked = !box.checked;
+    playSound('flip');
+  }
+}
+
+// 紀年轉換計算邏輯
+function convertMinguoToWestern() {
+  const minguoVal = document.getElementById('inputMinguo').value;
+  const resultSpan = document.getElementById('resultWestern');
+  if (minguoVal && minguoVal > 0) {
+    const western = parseInt(minguoVal) + 1911;
+    resultSpan.textContent = `➔ 西元 ${western} 年`;
+  } else {
+    resultSpan.textContent = `➔ 西元 1947 年`;
+  }
+}
+function convertWesternToMinguo() {
+  const westernVal = document.getElementById('inputWestern').value;
+  const resultSpan = document.getElementById('resultMinguo');
+  if (westernVal && westernVal >= 1912) {
+    const minguo = parseInt(westernVal) - 1911;
+    resultSpan.textContent = `➔ 民國 ${minguo} 年`;
+  } else {
+    resultSpan.textContent = `➔ 民國 76 年`;
+  }
+}
+
+// 音效合成器 (Web Audio API)
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(type) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  if (type === 'correct') {
+    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.45);
+  } else if (type === 'wrong') {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(220.00, audioCtx.currentTime); // A3
+    osc.frequency.setValueAtTime(147.00, audioCtx.currentTime + 0.15); // D3
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.4);
+  } else if (type === 'flip') {
+    osc.frequency.setValueAtTime(440.00, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+  }
+}
+
+// 繽紛糖果彩帶特效 (Canvas Confetti)
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let animFrame;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function createConfetti() {
+  particles = [];
+  const colors = ['#e53935', '#ffb300', '#43a047', '#1e88e5', '#8e24aa', '#ff7043'];
+  for (let i = 0; i < 150; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * 100,
+      r: 4 + Math.random() * 8,
+      d: Math.random() * canvas.height,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      tilt: Math.random() * 10 - 5,
+      tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+      tiltAngle: 0
+    });
+  }
+  if (animFrame) cancelAnimationFrame(animFrame);
+  drawConfetti();
+}
+
+function drawConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  let active = false;
+  particles.forEach(p => {
+    p.tiltAngle += p.tiltAngleIncremental;
+    p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+    p.x += Math.sin(p.tiltAngle);
+    p.tilt = Math.sin(p.tiltAngle - p.r / 2) * 5;
+
+    ctx.beginPath();
+    ctx.lineWidth = p.r;
+    ctx.strokeStyle = p.color;
+    ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+    ctx.stroke();
+
+    if (p.y < canvas.height) {
+      active = true;
+    }
+  });
+  if (active) {
+    animFrame = requestAnimationFrame(drawConfetti);
+  } else {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+// Tab 切換控制
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+    btn.classList.add('active');
+    const tabId = btn.dataset.tab;
+    const activeTab = document.getElementById(tabId);
+    activeTab.classList.add('active');
+
+    // 小助手提示內容更新
+    updateAssistant(tabId);
+    // 進入互動挑戰時若無學生資料，彈出輸入視窗
+    if (tabId === 'gameTab') {
+      showStudentModalIfNeeded();
+    }
+  });
+});
+
+function updateAssistant(tabId) {
+  const title = document.getElementById('assistantTitle');
+  const desc = document.getElementById('assistantDesc');
+  
+  if (tabId === 'introTab') {
+    title.textContent = '黑熊小助手提示';
+    desc.textContent = '歡迎來到第四章「戰後臺灣的政治」學習網頁！點選上方的「歷史分期」與「人物與氛圍」可閱讀重點圖文，點選「挑戰遊戲」開始進行課後複習！';
+  } else if (tabId === 'timelineTab') {
+    title.textContent = '⏳ 歷史分期學習中';
+    desc.textContent = '請點選紅、灰、綠三張不同的分期卡片，詳細閱讀戰後初期與二二八、戒嚴與白色恐怖、以及民主改革時期的政治變遷歷程！';
+  } else if (tabId === 'agencyTab') {
+    title.textContent = '🏛️ 人物與氛圍學習中';
+    desc.textContent = '點擊上方人物肖像輪播以查看雷震、高一生、陳澄波與蔣經國、李登輝的生平。下方展示了防諜與愛國歌曲的戒嚴風貌！';
+  } else if (tabId === 'summaryTab') {
+    title.textContent = '📊 重點總對照與列印';
+    desc.textContent = '這是本課的三階段政治體制總整理表。你可以點選「列印/儲存為複習學習單」下載列印成實體紙筆作業單喔！';
+  } else if (tabId === 'gameTab') {
+    title.textContent = '🎮 課後複習挑戰';
+    desc.textContent = '三關挑戰總分 100 分：大事排序(30分) ➔ 體制規範對對碰(30分) ➔ 翻牌配對(40分)。通關後可獲得成績證書並上傳！';
+  }
+}
+
+// ====== 單元二：歷史分期詳細切換 ======
+document.querySelectorAll('.timeline-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.timeline-card').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.period-detail').forEach(d => d.classList.remove('active'));
+    
+    card.classList.add('active');
+    const periodId = card.dataset.period;
+    document.getElementById(periodId).classList.add('active');
+    playSound('flip');
+  });
+});
+
+// ====== 單元三：歷史人物生平切換 ======
+const BIOS = {
+  c1: {
+    name: '陳澄波',
+    title: '生卒年：西元 1895～1947 年',
+    desc: '日治時期首位入選日本帝國美術展覽會的臺灣西畫家。二二八事件爆發後，嘉義地區爆發衝突，他身為嘉義市「二二八事件處理委員會」的民間代表之一，抱持著愛護鄉里的熱忱與國軍代表協商。然而軍隊不顧和平訴求，將其逮捕並在未經正常、公開的司法審判下，在嘉義火車站前公開槍決，是二二八中受難代表的深刻痛楚。',
+    img: 'images/l04_clean/portrait_chen_cheng_po.jpg'
+  },
+  c2: {
+    name: '高一生',
+    title: '生卒年：西元 1908～1954 年',
+    desc: '鄒族領袖，也是日治時期最早接受現代高等教育的原住民菁英。戰後擔任吳鳳鄉（今嘉義縣阿里山鄉）鄉長。他熱心培育原住民菁英、開墾水田，積極為原住民族爭取自治與發展機會。然而在白色恐怖時期，政府濫用公權力，於民國41年將其誘捕，誣指他「與匪諜集會叛亂」，於民國43年判處死刑槍決，是國家暴力的受害者。',
+    img: 'images/l04_clean/portrait_gao_yi_sheng.jpg'
+  },
+  c3: {
+    name: '雷震',
+    title: '生卒年：西元 1897～1979 年',
+    desc: '戰後初期創辦《自由中國》半月刊雜誌，積極向社會引介民主憲政體制，並在文章中批評政府限縮人民自由、凍結憲政法規。民國49年，雷震聯合臺灣與外省籍反對運動人士籌組「中國民主黨」挑戰黨禁，隨後遭到威權政府壓制逮捕，判刑十年，《自由中國》雜誌也隨之停刊，是戒嚴時期著名的雷震事件。',
+    img: 'images/l04_clean/portrait_lei_zhen.jpg'
+  },
+  c4: {
+    name: '陳儀',
+    title: '任期：民國 34～36 年（行政長官）',
+    desc: '戰後中華民國指派的首位臺灣省行政長官，兼任警備總司令。他手握臺灣行政、軍事與立法大權，治臺政策不當。在其統治期間，大量任用外省籍官員，經濟管制引發民生米糧短缺與物價飆飛。二二八事件爆發後，他一邊在廣播中假意應允改革、組成委員會，一邊密電蔣中正派遣重兵渡海鎮壓清鄉，後因此被撤除行政長官職務。',
+    img: 'images/l04_clean/stamp_local_autonomy.jpg'
+  },
+  c5: {
+    name: '蔣經國',
+    title: '總統任期：民國 67～77 年',
+    desc: '繼承蔣中正總統職權，面臨國內外巨變（退出聯合國與中美斷交）。為因應局勢推動十大建設，並在民國68年面臨高雄「美麗島事件」爆發。在晚年體察社會民怨與要求改革的浪潮，順應時代大趨勢，於民國76年（1987）7月14日正式簽署佈告解除長達38年的臺灣省戒嚴令，並開放赴大陸探親、開拓黨禁與報禁。',
+    img: 'images/l04_clean/portrait_chiang_ching_kuo.jpg'
+  },
+  c6: {
+    name: '李登輝',
+    title: '總統任期：民國 77～89 年',
+    desc: '繼任蔣經國總統職位。在任內順應民國79年（1990）「三月學運（野百合學運）」大學生提出的訴求，於民國80年正式宣布終止動員戡亂時期、廢除《動員戡亂時期臨時條款》，隨後廢除萬年國會、改選中央民代。並在民國85年（1996）舉辦臺灣歷史上首次由人民直接投票選出總統，順利當選首任民選總統，被譽為臺灣「民主先生」。',
+    img: 'images/l04_clean/propaganda_presidential_election.jpg'
+  }
+};
+
+document.querySelectorAll('.figure-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.figure-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    
+    const bioId = item.dataset.bio;
+    const info = BIOS[bioId];
+    
+    document.getElementById('bioName').textContent = info.name;
+    document.getElementById('bioTitle').textContent = info.title;
+    document.getElementById('bioDesc').textContent = info.desc;
+    document.getElementById('bioImg').src = info.img;
+    playSound('flip');
+  });
+});
+
+// ====== 輔助函數：數組洗牌 ======
+function shuffle(array) {
+  let currentIndex = array.length, randomIndex;
+  while (currentIndex != 0) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
+
+// ================== 挑戰遊戲狀態機與通關紀錄 ==================
+let challengeState = {
+  current: 0,
+  completed: [false, false, false],
+  scores: [0, 0, 0]
+};
+
+function advanceChallenge(gameIdx, score) {
+  if (challengeState.completed[gameIdx]) return;
+  challengeState.completed[gameIdx] = true;
+  challengeState.scores[gameIdx] = score;
+
+  // 更新進度條 UI
+  for (let i = 0; i < 3; i++) {
+    const step = document.getElementById('cStep' + (i + 1));
+    const icon = document.getElementById('cIcon' + (i + 1));
+    const conn = document.getElementById('cConn' + (i + 1));
+    if (!step) continue;
+    step.classList.remove('unlocked', 'completed');
+    if (challengeState.completed[i]) {
+      step.classList.add('completed');
+      if (icon) icon.textContent = '✅';
+    } else if (i === gameIdx + 1) {
+      step.classList.add('unlocked');
+      if (icon) icon.textContent = '🔓';
+    }
+    if (conn && challengeState.completed[i]) conn.classList.add('done');
+  }
+
+  // 隱藏目前遊戲區
+  const currentPanel = document.getElementById('cGame' + (gameIdx + 1));
+  if (currentPanel) currentPanel.classList.remove('active');
+
+  const nextIdx = gameIdx + 1;
+  if (nextIdx < 3) {
+    challengeState.current = nextIdx;
+    const nextPanel = document.getElementById('cGame' + (nextIdx + 1));
+    if (nextPanel) {
+      nextPanel.style.display = '';
+      setTimeout(() => nextPanel.classList.add('active'), 100);
+    }
+    if (nextIdx === 1) initGame2();
+    if (nextIdx === 2) initGame3();
+  } else {
+    showCertificate();
+  }
+}
+
+function showCertificate() {
+  for (let i = 1; i <= 3; i++) {
+    const panel = document.getElementById('cGame' + i);
+    if (panel) panel.classList.remove('active');
+  }
+
+  const now = new Date();
+  const dateStr = now.getFullYear() + ' 年 ' + (now.getMonth() + 1) + ' 月 ' + now.getDate() + ' 日';
+  const total = challengeState.scores.reduce((a, b) => a + b, 0);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box cert-popup">
+      <h2>🏆 通關證書</h2>
+      <p class="cert-subtitle">恭喜你完成「戰後臺灣的政治」三大互動挑戰！<br>你已深刻理解從二二八事件、戒嚴體制，到民主化變遷的關鍵事件與人物歷史。</p>
+      <div class="cert-scores">
+        <div class="cert-score-row"><span>📅 挑戰一：大事排序</span><span class="cert-pts">${challengeState.scores[0]} / 30 分</span></div>
+        <div class="cert-score-row"><span>💬 挑戰二：體制對對碰</span><span class="cert-pts">${challengeState.scores[1]} / 30 分</span></div>
+        <div class="cert-score-row"><span>🃏 挑戰三：翻牌記憶配對</span><span class="cert-pts">${challengeState.scores[2]} / 40 分</span></div>
+        <div class="cert-score-total"><span>總得分</span><span class="cert-total-pts">${total} / 100 分</span></div>
+      </div>
+      <p class="cert-date">完成日期：${dateStr}</p>
+      <p class="cert-status" id="certStatus" style="font-size:13px; color:#546e7a; margin: 6px 0 14px;">⏳ 正在將成績上傳至系統資料庫...</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="certCloseBtn">關閉證書</button>
+        <button class="btn btn-primary" id="certRetryBtn">🔄 重新挑戰</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  createConfetti();
+  playSound('correct');
+
+  saveCompletionToFirestore(total, dateStr, overlay);
+
+  overlay.querySelector('#certCloseBtn').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#certRetryBtn').addEventListener('click', () => {
+    overlay.remove();
+    resetAllChallenges();
+  });
+}
+
+function saveCompletionToFirestore(total, dateStr, overlay) {
+  const statusEl = overlay.querySelector('#certStatus');
+  if (!db) {
+    if (statusEl) {
+      statusEl.textContent = '⚠️ 離線狀態：未能連線至資料庫，通關紀錄已儲存在本機。';
+      statusEl.style.color = '#e65100';
+    }
+    return;
+  }
+  const studentInfo = getStudentInfo();
+  if (!studentInfo || !studentInfo.classId || !studentInfo.name) {
+    if (statusEl) {
+      statusEl.textContent = '⚠️ 未能儲存：未填寫學生班級與姓名。';
+      statusEl.style.color = '#c62828';
+    }
+    return;
+  }
+  const payload = {
+    chapter: CHAPTER_CODE,
+    chapterTitle: CHAPTER_TITLE,
+    classId: studentInfo.classId,
+    name: studentInfo.name,
+    scores: challengeState.scores.slice(),
+    total: total,
+    clientDate: dateStr,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  db.collection('completions').add(payload)
+    .then(() => {
+      if (statusEl) {
+        statusEl.textContent = '✅ 成績已成功上傳儲存！老師可在後台直接閱覽。';
+        statusEl.style.color = '#2e7d32';
+      }
+    })
+    .catch(err => {
+      console.warn('Firestore 寫入失敗：', err);
+      if (statusEl) {
+        statusEl.textContent = '⚠️ 網路連線錯誤，無法完成上傳，建議截圖給老師。';
+        statusEl.style.color = '#c62828';
+      }
+    });
+}
+
+function resetAllChallenges() {
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    if (o.id !== 'studentModal') o.remove();
+  });
+  challengeState = { current: 0, completed: [false, false, false], scores: [0, 0, 0] };
+  for (let i = 0; i < 3; i++) {
+    const step = document.getElementById('cStep' + (i + 1));
+    const icon = document.getElementById('cIcon' + (i + 1));
+    const conn = document.getElementById('cConn' + (i + 1));
+    if (step) {
+      step.classList.remove('unlocked', 'completed');
+      if (i === 0) step.classList.add('unlocked');
+    }
+    if (icon) icon.textContent = i === 0 ? '🔓' : '🔒';
+    if (conn) conn.classList.remove('done');
+  }
+  
+  const cG2 = document.getElementById('cGame2');
+  if (cG2) { cG2.style.display = 'none'; cG2.classList.remove('active'); }
+  const cG3 = document.getElementById('cGame3');
+  if (cG3) { cG3.style.display = 'none'; cG3.classList.remove('active'); }
+  const cG1 = document.getElementById('cGame1');
+  if (cG1) { cG1.style.display = ''; cG1.classList.add('active'); }
+  
+  document.getElementById('g1Msg').className = 'game-message';
+  document.getElementById('g2Msg').className = 'game-message';
+  document.getElementById('g3Msg').className = 'game-message';
+  
+  initGame1();
+}
+
+function showCheckpointModal(gameIdx, score, maxScore, correctCount, totalItems) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <h2>⏸️ 關卡分數結算</h2>
+      <div class="result-score">${score} / ${maxScore} 分</div>
+      <p class="result-text">答對 ${correctCount} / ${totalItems} 題（每一錯題倒扣 5 分，最少 0 分）</p>
+      <p class="retry-question">你想挑戰重新作答拿到更高分，還是以目前成績通關下一階段？</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cpRetry">🔄 重新挑戰</button>
+        <button class="btn btn-primary" id="cpPass">直接通關 ➔</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#cpRetry').addEventListener('click', () => {
+    overlay.remove();
+    if (gameIdx === 0) resetGame1();
+    if (gameIdx === 1) resetGame2();
+  });
+  overlay.querySelector('#cpPass').addEventListener('click', () => {
+    overlay.remove();
+    advanceChallenge(gameIdx, score);
+  });
+}
+
+// ====== 觸控拖曳支援 (平板無字輸入輔助) ======
+let activeDragProxy = null;
+let activeDragSource = null;
+
+function setupTouchDrag(card, getDragData, handleDropOnTarget) {
+  card.addEventListener('touchstart', e => {
+    if (card.classList.contains('placed')) return;
+    activeDragSource = card;
+    const dragData = getDragData(card);
+    const touch = e.touches[0];
+    const rect = card.getBoundingClientRect();
+    const offsetX = touch.clientX - rect.left;
+    const offsetY = touch.clientY - rect.top;
+    let isMoving = false;
+
+    function onTouchMove(moveEvt) {
+      const t = moveEvt.touches[0];
+      if (!isMoving) {
+        if (Math.abs(t.clientX - touch.clientX) > 5 || Math.abs(t.clientY - touch.clientY) > 5) {
+          isMoving = true;
+          activeDragProxy = card.cloneNode(true);
+          activeDragProxy.classList.add('dragging-proxy');
+          activeDragProxy.style.position = 'fixed';
+          activeDragProxy.style.width = rect.width + 'px';
+          activeDragProxy.style.height = rect.height + 'px';
+          activeDragProxy.style.zIndex = '9999';
+          activeDragProxy.style.pointerEvents = 'none';
+          activeDragProxy.style.opacity = '0.85';
+          activeDragProxy.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
+          document.body.appendChild(activeDragProxy);
+          card.classList.add('dragging');
+        }
+      }
+      if (isMoving && activeDragProxy) {
+        moveEvt.preventDefault();
+        activeDragProxy.style.left = (t.clientX - offsetX) + 'px';
+        activeDragProxy.style.top = (t.clientY - offsetY) + 'px';
+        const elem = document.elementFromPoint(t.clientX, t.clientY);
+        const dropTarget = elem ? elem.closest('.timeline-slot, .slogan-bin') : null;
+        document.querySelectorAll('.timeline-slot, .slogan-bin').forEach(el => el.classList.remove('drag-over'));
+        if (dropTarget) dropTarget.classList.add('drag-over');
+      }
+    }
+
+    function onTouchEnd(endEvt) {
+      window.removeEventListener('touchmove', onTouchMove, { passive: false });
+      window.removeEventListener('touchend', onTouchEnd);
+      card.classList.remove('dragging');
+      if (isMoving && activeDragProxy) {
+        const t = endEvt.changedTouches[0];
+        const elem = document.elementFromPoint(t.clientX, t.clientY);
+        const dropTarget = elem ? elem.closest('.timeline-slot, .slogan-bin') : null;
+        document.querySelectorAll('.timeline-slot, .slogan-bin').forEach(el => el.classList.remove('drag-over'));
+        if (dropTarget) handleDropOnTarget(dropTarget, dragData);
+        activeDragProxy.remove();
+        activeDragProxy = null;
+      }
+      activeDragSource = null;
+    }
+
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd);
+  }, { passive: true });
+}
+
+// ----------------- 遊戲一：時光重組 (拖曳排序) -----------------
+const TIMELINE_DATA = [
+  { year: '36年', event: '二二八事件爆發' },
+  { year: '37年', event: '制定動員戡亂臨時條款' },
+  { year: '38年', event: '實施臺灣省戒嚴令' },
+  { year: '49年', event: '雷震案爆發雜誌停刊' },
+  { year: '68年', event: '美麗島事件爆發' },
+  { year: '76年', event: '蔣經國總統宣布解嚴' }
+];
+
+let g1Placed = {};
+let g1SelectedEvent = null;
+let g1SelectedCard = null;
+
+function initGame1() {
+  g1Placed = {};
+  g1SelectedEvent = null;
+  g1SelectedCard = null;
+  document.getElementById('g1Score').textContent = '0';
+  document.getElementById('g1Msg').className = 'game-message';
+
+  const slotsContainer = document.getElementById('tSlots');
+  slotsContainer.innerHTML = '';
+  TIMELINE_DATA.forEach(d => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'timeline-slot-wrapper';
+
+    const yearBadge = document.createElement('div');
+    yearBadge.className = 'slot-year';
+    yearBadge.textContent = '民國 ' + d.year;
+
+    const slot = document.createElement('div');
+    slot.className = 'timeline-slot';
+    slot.dataset.year = d.year;
+    slot.textContent = '拖曳/點擊放入';
+    
+    // 拖曳監聽
+    slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('drag-over'); });
+    slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+    slot.addEventListener('drop', e => {
+      e.preventDefault();
+      slot.classList.remove('drag-over');
+      handleG1Drop(slot, e.dataTransfer.getData('text/plain'));
+    });
+    
+    // 點擊輔助監聽（支援平板無拖曳手勢）
+    slot.addEventListener('click', () => {
+      if (g1SelectedEvent) {
+        handleG1Drop(slot, g1SelectedEvent);
+        if (g1SelectedCard) g1SelectedCard.classList.remove('selected-card');
+        g1SelectedCard = null;
+        g1SelectedEvent = null;
+      } else {
+        // 若點擊已有事件的 Slot，將卡片收回
+        const oldVal = slot.dataset.placedEvent;
+        if (oldVal) {
+          const oldCard = document.querySelector(`#tPool .drag-card[data-event="${oldVal}"]`);
+          if (oldCard) oldCard.classList.remove('placed');
+          slot.textContent = '拖曳/點擊放入';
+          slot.className = 'timeline-slot';
+          delete slot.dataset.placedEvent;
+          delete g1Placed[slot.dataset.year];
+          playSound('flip');
+          updateG1Score();
+        }
+      }
+    });
+
+    wrapper.appendChild(yearBadge);
+    wrapper.appendChild(slot);
+    slotsContainer.appendChild(wrapper);
+  });
+
+  // 生成並隨機打亂池卡片
+  const pool = document.getElementById('tPool');
+  pool.innerHTML = '';
+  shuffle(TIMELINE_DATA.map(d => d.event)).forEach(evt => {
+    const card = document.createElement('div');
+    card.className = 'drag-card';
+    card.draggable = true;
+    card.textContent = evt;
+    card.dataset.event = evt;
+    card.addEventListener('dragstart', e => {
+      card.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', evt);
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.addEventListener('click', () => {
+      if (card.classList.contains('placed')) return;
+      if (g1SelectedCard === card) {
+        card.classList.remove('selected-card');
+        g1SelectedCard = null;
+        g1SelectedEvent = null;
+      } else {
+        if (g1SelectedCard) g1SelectedCard.classList.remove('selected-card');
+        card.classList.add('selected-card');
+        g1SelectedCard = card;
+        g1SelectedEvent = evt;
+      }
+      playSound('flip');
+    });
+    setupTouchDrag(card, c => c.dataset.event, (target, dragData) => {
+      if (target.classList.contains('timeline-slot')) handleG1Drop(target, dragData);
+    });
+    pool.appendChild(card);
+  });
+}
+
+function handleG1Drop(slot, eventName) {
+  const oldVal = slot.dataset.placedEvent;
+  if (oldVal) {
+    const oldCard = document.querySelector(`#tPool .drag-card[data-event="${oldVal}"]`);
+    if (oldCard) oldCard.classList.remove('placed');
+  }
+  slot.textContent = eventName;
+  slot.dataset.placedEvent = eventName;
+  slot.className = 'timeline-slot filled';
+  g1Placed[slot.dataset.year] = eventName;
+  const dragCard = document.querySelector(`#tPool .drag-card[data-event="${eventName}"]`);
+  if (dragCard) dragCard.classList.add('placed');
+  playSound('flip');
+  updateG1Score();
+}
+
+function updateG1Score() {
+  let correct = 0;
+  TIMELINE_DATA.forEach(d => {
+    if (g1Placed[d.year] === d.event) correct++;
+  });
+  document.getElementById('g1Score').textContent = correct * 5;
+}
+
+function checkGame1() {
+  const total = TIMELINE_DATA.length;
+  let correct = 0;
+  let placedCount = 0;
+  TIMELINE_DATA.forEach(d => {
+    const placed = g1Placed[d.year];
+    const slot = document.querySelector(`.timeline-slot[data-year="${d.year}"]`);
+    if (!placed) return;
+    placedCount++;
+    if (placed === d.event) {
+      correct++;
+    } else {
+      if (slot) {
+        slot.className = 'timeline-slot wrong';
+        setTimeout(() => slot.classList.remove('wrong'), 1500);
+      }
+    }
+  });
+
+  const msg = document.getElementById('g1Msg');
+  if (placedCount < total) {
+    msg.className = 'game-message error';
+    msg.textContent = `尚有 ${total - placedCount} 個年份未放置，請完成後再送出！`;
+    playSound('wrong');
+    return;
+  }
+  
+  const wrong = total - correct;
+  let score = Math.max(0, 5 * correct - 5 * wrong);
+
+  if (correct === total) {
+    msg.className = 'game-message success';
+    msg.textContent = '🎉 完美答對！戰後重大政治事件的發生的先後順序全對！進入下一關！';
+    playSound('correct');
+    createConfetti();
+    setTimeout(() => advanceChallenge(0, 30), 1200);
+  } else {
+    msg.className = 'game-message error';
+    msg.textContent = `答對 ${correct} 題（答錯扣 5 分），本關得分：${score} 分。`;
+    playSound('wrong');
+    setTimeout(() => showCheckpointModal(0, score, 30, correct, total), 600);
+  }
+}
+
+function resetGame1() {
+  initGame1();
+}
+
+// ----------------- 遊戲二：規範與體制對對碰 -----------------
+const SLOGAN_DATA = [
+  { text: '宣傳「小心匪諜，人人有責」以密告親友', cat: 'authoritarian' },
+  { text: '由人民投票直接選舉總統與副總統', cat: 'democratic' },
+  { text: '發起罷工請願與上街集會遊行活動', cat: 'democratic' },
+  { text: '發布宵禁並限制出入境須經警總特許', cat: 'authoritarian' },
+  { text: '設立海基會與海協會開啟兩岸對口協商', cat: 'democratic' },
+  { text: '實行報禁出版檢查，甚至查禁為匪宣傳歌曲', cat: 'authoritarian' }
+];
+
+let g2Placed = {};
+let g2SelectedSlogan = null;
+let g2SelectedCard = null;
+
+function initGame2() {
+  g2Placed = {};
+  g2SelectedSlogan = null;
+  g2SelectedCard = null;
+  document.getElementById('g2Score').textContent = '0';
+  document.getElementById('g2Msg').className = 'game-message';
+
+  // 清空兩個分類盒子
+  document.querySelectorAll('.slogan-bin').forEach(bin => {
+    const h3 = bin.querySelector('h3');
+    const itemsContainer = bin.querySelector('.bin-items') || bin;
+    itemsContainer.innerHTML = '';
+    
+    bin.addEventListener('dragover', e => { e.preventDefault(); bin.classList.add('drag-over'); });
+    bin.addEventListener('dragleave', () => bin.classList.remove('drag-over'));
+    bin.addEventListener('drop', e => {
+      e.preventDefault();
+      bin.classList.remove('drag-over');
+      handleG2Drop(bin, e.dataTransfer.getData('text/plain'));
+    });
+    bin.addEventListener('click', () => {
+      if (g2SelectedSlogan) {
+        handleG2Drop(bin, g2SelectedSlogan);
+        if (g2SelectedCard) g2SelectedCard.classList.remove('selected-card');
+        g2SelectedCard = null;
+        g2SelectedSlogan = null;
+      }
+    });
+  });
+
+  // 隨機池生成
+  const pool = document.getElementById('sPool');
+  pool.innerHTML = '';
+  shuffle(SLOGAN_DATA.slice()).forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'drag-card';
+    card.draggable = true;
+    card.textContent = item.text;
+    card.dataset.slogan = item.text;
+    card.addEventListener('dragstart', e => {
+      card.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', item.text);
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.addEventListener('click', () => {
+      if (card.classList.contains('placed')) return;
+      if (g2SelectedCard === card) {
+        card.classList.remove('selected-card');
+        g2SelectedCard = null;
+        g2SelectedSlogan = null;
+      } else {
+        if (g2SelectedCard) g2SelectedCard.classList.remove('selected-card');
+        card.classList.add('selected-card');
+        g2SelectedCard = card;
+        g2SelectedSlogan = item.text;
+      }
+      playSound('flip');
+    });
+    setupTouchDrag(card, c => c.dataset.slogan, (target, dragData) => {
+      if (target.classList.contains('slogan-bin')) handleG2Drop(target, dragData);
+    });
+    pool.appendChild(card);
+  });
+}
+
+function handleG2Drop(bin, sloganText) {
+  const itemData = SLOGAN_DATA.find(d => d.text === sloganText);
+  if (!itemData) return;
+
+  const binCat = bin.dataset.cat;
+  
+  // 若卡片已放置在另一個盒子中，則先移除
+  if (g2Placed[sloganText]) {
+    const oldBinId = g2Placed[sloganText] === 'authoritarian' ? 'binAuth' : 'binDemo';
+    const oldBin = document.getElementById(oldBinId);
+    const oldChip = oldBin.querySelector(`.bin-chip[data-text="${sloganText}"]`);
+    if (oldChip) oldChip.remove();
+  }
+
+  // 移出原卡池標記
+  const dragCard = document.querySelector(`#sPool .drag-card[data-slogan="${sloganText}"]`);
+  if (dragCard) dragCard.classList.add('placed');
+
+  // 在盒子中插入晶片
+  const targetId = binCat === 'authoritarian' ? 'binAuth' : 'binDemo';
+  const targetContainer = document.getElementById(targetId);
+  
+  const chip = document.createElement('div');
+  chip.className = `bin-chip ${binCat === 'authoritarian' ? 'c1' : 'c2'}`;
+  chip.dataset.text = sloganText;
+  chip.innerHTML = `<span>${sloganText}</span> ❌`;
+  
+  // 點擊❌可以將晶片移除並還原回卡池
+  chip.addEventListener('click', (e) => {
+    e.stopPropagation();
+    chip.remove();
+    delete g2Placed[sloganText];
+    if (dragCard) dragCard.classList.remove('placed');
+    playSound('flip');
+    updateG2Score();
+  });
+
+  targetContainer.appendChild(chip);
+  g2Placed[sloganText] = binCat;
+  playSound('flip');
+  updateG2Score();
+}
+
+function updateG2Score() {
+  let correct = 0;
+  SLOGAN_DATA.forEach(d => {
+    if (g2Placed[d.text] === d.cat) correct++;
+  });
+  document.getElementById('g2Score').textContent = correct * 5;
+}
+
+function checkGame2() {
+  const total = SLOGAN_DATA.length;
+  let correct = 0;
+  let placedCount = 0;
+  
+  SLOGAN_DATA.forEach(d => {
+    const placedCat = g2Placed[d.text];
+    if (!placedCat) return;
+    placedCount++;
+    if (placedCat === d.cat) {
+      correct++;
+    } else {
+      // 標紅答錯晶片
+      const binId = placedCat === 'authoritarian' ? 'binAuth' : 'binDemo';
+      const chip = document.querySelector(`#${binId} .bin-chip[data-text="${d.text}"]`);
+      if (chip) {
+        chip.style.borderColor = '#e53935';
+        chip.style.background = '#ffebee';
+        setTimeout(() => {
+          chip.style.borderColor = '';
+          chip.style.background = '';
+        }, 1500);
+      }
+    }
+  });
+
+  const msg = document.getElementById('g2Msg');
+  if (placedCount < total) {
+    msg.className = 'game-message error';
+    msg.textContent = `還有 ${total - placedCount} 個規範未完成分類，請全部放入分類盒中！`;
+    playSound('wrong');
+    return;
+  }
+
+  const wrong = total - correct;
+  let score = Math.max(0, 5 * correct - 5 * wrong);
+
+  if (correct === total) {
+    msg.className = 'game-message success';
+    msg.textContent = '🎉 非常棒！所有權利限制與體制變遷規範分類完全正確！進入終極翻翻樂！';
+    playSound('correct');
+    createConfetti();
+    setTimeout(() => advanceChallenge(1, 30), 1200);
+  } else {
+    msg.className = 'game-message error';
+    msg.textContent = `答對 ${correct} 題（答錯倒扣 5 分），本關得分：${score} 分。再加把勁！`;
+    playSound('wrong');
+    setTimeout(() => showCheckpointModal(1, score, 30, correct, total), 600);
+  }
+}
+
+function resetGame2() {
+  initGame2();
+}
+
+// ----------------- 遊戲三：人物與事蹟翻翻樂 (3D 翻牌) -----------------
+const FLIP_ITEMS = [
+  { pairId: 1, type: 'name', content: '陳澄波' },
+  { pairId: 1, type: 'desc', content: '因代表嘉義民意前往與國軍協商二二八事件，遭逮捕未經審判槍決' },
+  { pairId: 2, type: 'name', content: '高一生' },
+  { pairId: 2, type: 'desc', content: '鄒族原住民領袖，爭取土地權利遭威權特務誣以匪諜叛亂罪名槍決' },
+  { pairId: 3, type: 'name', content: '雷震' },
+  { pairId: 3, type: 'desc', content: '創辦《自由中國》批判時政，並籌組反對政黨挑戰戒嚴黨禁被判刑十年' },
+  { pairId: 4, type: 'name', content: '蔣經國' },
+  { pairId: 4, type: 'desc', content: '順應臺灣經濟與教育發展趨勢，於民國76年批示並發布解除戒嚴令' }
+];
+
+let g3Cards = [];
+let firstCard = null, secondCard = null;
+let lockBoard = false;
+let g3Matches = 0;
+
+function initGame3() {
+  firstCard = null;
+  secondCard = null;
+  lockBoard = false;
+  g3Matches = 0;
+  document.getElementById('g3MatchCount').textContent = '0';
+  document.getElementById('g3Msg').className = 'game-message';
+
+  const grid = document.getElementById('fGrid');
+  grid.innerHTML = '';
+  
+  // 洗牌
+  g3Cards = shuffle(FLIP_ITEMS.slice());
+  
+  g3Cards.forEach((item, index) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'flip-card-wrapper';
+    wrapper.dataset.index = index;
+    wrapper.dataset.pairId = item.pairId;
+
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+
+    const back = document.createElement('div');
+    back.className = 'card-face card-back';
+    back.textContent = '？';
+
+    const front = document.createElement('div');
+    front.className = 'card-face card-front';
+    front.textContent = item.content;
+
+    card.appendChild(back);
+    card.appendChild(front);
+    wrapper.appendChild(card);
+    
+    wrapper.addEventListener('click', () => handleG3Flip(wrapper));
+    
+    grid.appendChild(wrapper);
+  });
+}
+
+function handleG3Flip(wrapper) {
+  if (lockBoard) return;
+  const card = wrapper.querySelector('.flip-card');
+  if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+  card.classList.add('flipped');
+  playSound('flip');
+
+  if (!firstCard) {
+    firstCard = wrapper;
+    return;
+  }
+
+  secondCard = wrapper;
+  lockBoard = true;
+
+  // 比對 pairId
+  const match = firstCard.dataset.pairId === secondCard.dataset.pairId;
+  if (match) {
+    // 答對配對
+    setTimeout(() => {
+      firstCard.querySelector('.flip-card').classList.add('matched');
+      secondCard.querySelector('.flip-card').classList.add('matched');
+      
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+      
+      g3Matches++;
+      document.getElementById('g3MatchCount').textContent = g3Matches;
+      playSound('correct');
+      createConfetti();
+
+      if (g3Matches === 4) {
+        document.getElementById('g3Msg').className = 'game-message success';
+        document.getElementById('g3Msg').textContent = '🎉 卓越的成就！人物與事蹟配對全數通關！取得 100 分通關證書！';
+        setTimeout(() => advanceChallenge(2, 40), 1200);
+      }
+    }, 600);
+  } else {
+    // 答錯翻回
+    setTimeout(() => {
+      firstCard.querySelector('.flip-card').classList.remove('flipped');
+      secondCard.querySelector('.flip-card').classList.remove('flipped');
+      playSound('wrong');
+      
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+    }, 1400);
+  }
+}
+
+function resetGame3() {
+  initGame3();
+}
+</script>
+</body>
+</html>
