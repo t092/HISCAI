@@ -243,6 +243,73 @@
     to   { opacity: 0; }
   }
 
+  /* BOSSHUGE 敵人 (steeltobot.png: 288x96, 1x3 grid, 96x96 per frame) */
+  .boss {
+    position: absolute;
+    width: 96px; height: 96px;
+    background-image: url('images/steeltobot.png');
+    background-size: 288px 96px;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    z-index: 25;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.6));
+  }
+  .boss.fadeout {
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+
+  /* IronPotato 自爆馬鈴薯 (IronPotatos.png: 256x64, 4x1 grid, 64x64 per frame) */
+  .potato {
+    position: absolute;
+    width: 96px; height: 96px;
+    background-image: url('images/IronPotatos.png');
+    background-size: 384px 96px;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    z-index: 26;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    filter: drop-shadow(0 0 14px #fbbf24);
+  }
+  .potato.fadeout {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.2);
+  }
+
+  /* 敵人攻擊投射物 */
+  .projectile {
+    position: absolute;
+    width: 20px; height: 20px;
+    background: radial-gradient(circle, #fde047 0%, #f97316 50%, #dc2626 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 14px #ef4444, 0 0 28px #f97316, 0 0 40px rgba(239,68,68,0.6);
+    z-index: 28;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+
+  /* 爆炸光暈 */
+  .blast {
+    position: absolute;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(251,191,36,0.85) 30%, rgba(239,68,68,0.5) 60%, transparent 80%);
+    z-index: 27;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: blastPop 0.6s ease-out forwards;
+  }
+  @keyframes blastPop {
+    0%   { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
+    50%  { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(2.0); opacity: 0; }
+  }
+
   /* 開始/結束畫面 */
   .overlay {
     position: absolute; inset: 0;
@@ -291,8 +358,8 @@
     <h1>🤖 機器人出擊</h1>
     <p>
       用 <b>方向鍵</b> 移動機器人 · <b>Space</b> 發射光束射擊氣球<br><br>
-      ❤️ 3 條命，射錯扣 30 分並少一條命<br>
-      🎯 注意 命不回復 請愛惜生命 <br>
+      ❌ 射錯氣球 → <b>BOSSHUGE</b> 現身攻擊，每 0.5 秒發一發，被擊中扣 1 條命（可移動閃躲）<br>
+      ✅ 射對氣球 → <b>IronPotato</b> 自爆連帶摧毀其他 BOSS<br>
       🔥 共 10 題，從 32 題中隨機抽選，挑戰最高分！
     </p>
     <button onclick="startGame()">開始出擊</button>
@@ -328,7 +395,7 @@ const QUESTIONS = [
   { cat: '十大建設', q: '因中東石油危機而推動的政策是？', a: '十大建設', opts: ['進口替代','出口導向','十大建設','產業升級'] },
   { cat: '十大建設', q: '「帶動重化工業發展」是哪個政策的成果？', a: '十大建設', opts: ['進口替代','出口導向','十大建設','產業升級'] },
   { cat: '產業升級', q: '「新竹科學工業園區」屬於哪個政策？', a: '產業升級', opts: ['進口替代','出口導向','十大建設','產業升級'] },
-  { cat: '產業升級', q: '「發展高科技產業」是哪一個年代的政策？', a: '產業升級', opts: ['50年代','60年代','70年代','90年代'] },
+  { cat: '產業升級', q: '「發展高科技產業」是哪一個時期的政策？', a: '70年代', opts: ['50年代','60年代','40年代','70年代'] },
   { cat: '產業升級', q: '「資訊、電子等高附加價值產業」屬於哪一個政策時期？', a: '產業升級', opts: ['進口替代','出口導向','十大建設','產業升級'] },
 
   /* ===== 社會變遷題庫 ===== */
@@ -382,6 +449,9 @@ const dom = {
 let state = {
   level: 0, score: 0, lives: 3, maxLives: 3,
   balloons: [],
+  bosses: [],
+  projectiles: [],
+  potato: null,
   robot: { x: CANVAS_W/2 - ROBOT_S/2, y: CANVAS_H - 100 },
   locked: false,
   gameOver: false,
@@ -390,6 +460,14 @@ let state = {
   keys: {},
   target: null
 };
+
+/* ===== Sprite frame tables ===== */
+const BOSS_FRAME_SIZE = 96;
+const BOSS_FRAMES = [
+  [0, 0], [-BOSS_FRAME_SIZE, 0], [-BOSS_FRAME_SIZE*2, 0]
+];
+const POTATO_FRAME_SIZE = 96;
+const POTATO_FRAMES = [0, -POTATO_FRAME_SIZE, -POTATO_FRAME_SIZE*2, -POTATO_FRAME_SIZE*3];
 
 /* ===== 音效系統（Web Audio API 合成）===== */
 const sfx = {
@@ -560,6 +638,8 @@ function startGame() {
   state.questions = shuffle(QUESTIONS).slice(0, state.totalLevels);
   state.robot = { x: CANVAS_W/2 - ROBOT_S/2, y: CANVAS_H - 100 };
   state.locked = false; state.keys = {}; state.gameOver = false; state.target = null;
+  state.bosses = []; state.projectiles = []; state.potato = null;
+  document.querySelectorAll('.balloon, .boss, .potato, .projectile, .blast, .spark, .confetti').forEach(e => e.remove());
   robot.classList.remove('boom', 'walking');
   updateUI();
   loadLevel();
@@ -575,7 +655,8 @@ function loadLevel() {
   if (state.gameOver) return;
   if (state.level >= state.totalLevels) { endGame(true); return; }
   state.locked = false; state.balloons = []; state.target = null;
-  document.querySelectorAll('.balloon').forEach(b => b.remove());
+  state.bosses = []; state.projectiles = []; state.potato = null;
+  document.querySelectorAll('.balloon, .boss, .potato, .projectile, .blast, .spark').forEach(e => e.remove());
 
   const q = state.questions[state.level];
   dom.qText.textContent = q.q;
@@ -657,59 +738,269 @@ function crash(b) {
   b.classList.remove('floating');
   b.classList.add('crashed');
 
-  // 其他氣球淡出
-  state.balloons.forEach(o => {
-    if (o !== b) {
-      o.classList.remove('floating');
-      o.style.opacity = '0.25';
-    }
-  });
-
-  // 火花位置（使用快取中心點，無需 getBoundingClientRect）
+  // 火花位置（使用快取中心點）
   const sx = b._pos.x - 25;
   const sy = b._pos.y - 25;
 
   if (isCorrect) {
+    /* ===== 正確答案：IronPotato 自爆摧毀其他 BOSS ===== */
     state.score += 100;
     spawnSpark(sx, sy, '🎉');
-    spawnConfetti(b._pos.x, b._pos.y);
     sfx.correct();
+
+    // 在正確氣球位置出現 IronPotato
+    spawnIronPotato(b._pos.x, b._pos.y);
+
+    // 其他幾個氣球破掉，並各自出現 BOSSHUGE（不攻擊）
+    const others = state.balloons.filter(o => o !== b && !o.classList.contains('crashed'));
+    setTimeout(() => {
+      others.forEach(o => {
+        o.classList.remove('floating');
+        o.classList.add('crashed');
+        spawnBoss(o._pos.x, o._pos.y, false);
+      });
+    }, 250);
+
+    // IronPotato 自爆，連帶摧毀其他 BOSS
+    setTimeout(() => {
+      destroyAllBosses();
+      spawnConfetti(b._pos.x, b._pos.y);
+    }, 1500);
 
     setTimeout(() => {
       state.level++;
       if (state.level >= state.totalLevels) { endGame(true); return; }
       loadLevel();
-    }, 1000);
+    }, 2400);
 
   } else {
-    state.lives--;
+    /* ===== 錯誤答案：BOSSHUGE 出現並發動攻擊，氣球繼續可選 ===== */
     state.score = Math.max(0, state.score - 30);
     spawnSpark(sx, sy, '💥');
-    robot.classList.add('boom');
-    setTimeout(() => robot.classList.remove('boom'), 600);
-    updateUI();
     sfx.wrong();
-    sfx.loseLife();
 
-    // 生命歸零則結束
-    if (state.lives <= 0) {
-      setTimeout(() => endGame(false), 700);
-      return;
+    // 出現 BOSSHUGE 並對玩家發動攻擊
+    spawnBoss(b._pos.x, b._pos.y, true);
+
+    state.locked = false;
+  }
+}
+
+/* ===== BOSSHUGE 敵人 ===== */
+function spawnBoss(x, y, attacks) {
+  const boss = document.createElement('div');
+  boss.className = 'boss';
+  boss.style.left = x + 'px';
+  boss.style.top  = y + 'px';
+  boss._cx = x;
+  boss._cy = y;
+  canvas.appendChild(boss);
+
+  // idle: 固定顯示第 0 幀
+  boss.style.backgroundPosition = '0 0';
+
+  // 攻擊時：0→1→2→1→0 循環，每幀 120ms
+  let attackFrames = [0, 1, 2, 1, 0];
+
+  state.bosses = state.bosses || [];
+  state.bosses.push(boss);
+
+  function startAttackCycle() {
+    if (!boss.parentNode || state.gameOver || boss.classList.contains('fadeout')) return;
+
+    // 每次攻擊循環發射 4 發
+    let shotCount = 0;
+    const maxShots = 4;
+    const fireNext = () => {
+      if (!boss.parentNode || state.gameOver || boss.classList.contains('fadeout')) return;
+      fireProjectile(boss._cx, boss._cy);
+      shotCount++;
+      if (shotCount < maxShots) {
+        boss._shotTimer = setTimeout(fireNext, 500);
+      } else {
+        // 攻擊動畫回到 idle
+        if (boss._anim) clearInterval(boss._anim);
+        boss._anim = null;
+        boss.style.backgroundPosition = '0 0';
+        // 間隔 2.5 秒後再次攻擊
+        boss._nextAttack = setTimeout(startAttackCycle, 2500);
+      }
+    };
+
+    // 攻擊動畫：0→1→2→1→0
+    let fi = 0;
+    if (boss._anim) clearInterval(boss._anim);
+    boss._anim = setInterval(() => {
+      if (!boss.parentNode || boss.classList.contains('fadeout')) {
+        if (boss._anim) { clearInterval(boss._anim); boss._anim = null; }
+        return;
+      }
+      const frame = attackFrames[fi % attackFrames.length];
+      boss.style.backgroundPosition = `${-frame * BOSS_FRAME_SIZE}px 0`;
+      fi++;
+    }, 120);
+
+    fireNext();
+  }
+
+  if (attacks) {
+    boss._firstAttack = setTimeout(startAttackCycle, 350);
+  }
+
+  return boss;
+}
+
+function removeBoss(boss) {
+  if (!boss) return;
+  if (boss._anim)        clearInterval(boss._anim);
+  if (boss._attack)      clearInterval(boss._attack);
+  if (boss._firstAttack) clearTimeout(boss._firstAttack);
+  if (boss.parentNode) {
+    boss.classList.add('fadeout');
+    setTimeout(() => { if (boss.parentNode) boss.remove(); }, 360);
+  }
+  state.bosses = (state.bosses || []).filter(b => b !== boss);
+}
+
+function destroyAllBosses() {
+  (state.bosses || []).forEach(boss => {
+    if (boss.parentNode) {
+      const blast = document.createElement('div');
+      blast.className = 'blast';
+      blast.style.left = boss._cx + 'px';
+      blast.style.top  = boss._cy + 'px';
+      canvas.appendChild(blast);
+      setTimeout(() => blast.remove(), 650);
+      spawnSpark(boss._cx - 25, boss._cy - 25, '💥');
+    }
+    removeBoss(boss);
+  });
+  state.bosses = [];
+  sfx.noise({ dur: 0.6, vol: 0.5 });
+}
+
+/* ===== IronPotato 自爆馬鈴薯 ===== */
+function spawnIronPotato(x, y) {
+  const potato = document.createElement('div');
+  potato.className = 'potato';
+  potato.style.left = x + 'px';
+  potato.style.top  = y + 'px';
+  canvas.appendChild(potato);
+  state.potato = potato;
+
+  // 播放 4 幀爆炸動畫
+  let i = 0;
+  const animTimer = setInterval(() => {
+    potato.style.backgroundPosition = `${POTATO_FRAMES[i % POTATO_FRAMES.length]}px 0`;
+    i++;
+  }, 120);
+  potato._anim = animTimer;
+
+  // 最終自爆
+  setTimeout(() => {
+    clearInterval(animTimer);
+    const blast = document.createElement('div');
+    blast.className = 'blast';
+    blast.style.left = x + 'px';
+    blast.style.top  = y + 'px';
+    blast.style.background = 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(253,224,71,0.85) 25%, rgba(251,146,60,0.6) 55%, transparent 80%)';
+    canvas.appendChild(blast);
+    setTimeout(() => blast.remove(), 650);
+    spawnSpark(x - 25, y - 25, '💥');
+    sfx.noise({ dur: 0.5, vol: 0.45 });
+    potato.classList.add('fadeout');
+    setTimeout(() => {
+      if (potato.parentNode) potato.remove();
+      state.potato = null;
+    }, 320);
+  }, 1100);
+}
+
+/* ===== 投射物 ===== */
+function fireProjectile(bossX, bossY) {
+  const proj = document.createElement('div');
+  proj.className = 'projectile';
+  proj.style.left = bossX + 'px';
+  proj.style.top  = bossY + 'px';
+  canvas.appendChild(proj);
+
+  // 朝玩家「當前位置」發射（玩家可閃躲）
+  const targetX = state.robot.x + ROBOT_S/2;
+  const targetY = state.robot.y + ROBOT_S/2;
+  const dx = targetX - bossX;
+  const dy = targetY - bossY;
+  const dist = Math.hypot(dx, dy) || 1;
+  const speed = 5.5;
+  proj._vx = (dx / dist) * speed;
+  proj._vy = (dy / dist) * speed;
+
+  state.projectiles = state.projectiles || [];
+  state.projectiles.push(proj);
+  // 投射物發射音
+  sfx.tone({ freq: 660, slideTo: 180, type: 'sawtooth', dur: 0.18, vol: 0.22 });
+}
+
+function updateProjectiles() {
+  state.projectiles = (state.projectiles || []).filter(proj => {
+    if (!proj.parentNode) return false;
+    const left = parseFloat(proj.style.left);
+    const top  = parseFloat(proj.style.top);
+    const newLeft = left + proj._vx;
+    const newTop  = top  + proj._vy;
+    proj.style.left = newLeft + 'px';
+    proj.style.top  = newTop  + 'px';
+
+    // 命中玩家判定
+    const playerCx = state.robot.x + ROBOT_S/2;
+    const playerCy = state.robot.y + ROBOT_S/2;
+    const dist = Math.hypot(newLeft - playerCx, newTop - playerCy);
+    if (dist < ROBOT_S/2 + 4) {
+      proj.remove();
+      playerHit();
+      return false;
     }
 
-    // 否則恢復其他氣球，繼續挑戰
-    setTimeout(() => {
-      state.locked = false;
-      state.target = null;
-      robot.classList.remove('walking');
-      state.balloons.forEach(o => {
-        if (!o.classList.contains('crashed')) {
-          o.style.opacity = '1';
-          o.classList.add('floating');
-        }
-      });
-    }, 600);
+    // 飛出畫面則移除
+    if (newLeft < -30 || newLeft > CANVAS_W + 30 || newTop < -30 || newTop > CANVAS_H + 30) {
+      proj.remove();
+      return false;
+    }
+    return true;
+  });
+}
+
+function playerHit() {
+  if (state.gameOver) return;
+  state.lives--;
+  spawnSpark(state.robot.x - 5, state.robot.y - 5, '💥');
+  robot.classList.add('boom');
+  setTimeout(() => robot.classList.remove('boom'), 600);
+  updateUI();
+  sfx.wrong();
+  sfx.loseLife();
+
+  if (state.lives <= 0) {
+    setTimeout(() => endGame(false), 700);
+    return;
   }
+
+  // 被擊中後只清除投射物，BOSS 繼續存在
+  (state.projectiles || []).forEach(p => { if (p.parentNode) p.remove(); });
+  state.projectiles = [];
+}
+
+/* 錯誤後恢復：重新啟用其他氣球 */
+function resumeAfterWrong() {
+  if (state.gameOver) return;
+  state.locked = false;
+  state.target = null;
+  robot.classList.remove('walking');
+  state.balloons.forEach(o => {
+    if (!o.classList.contains('crashed')) {
+      o.style.opacity = '1';
+      o.classList.add('floating');
+    }
+  });
 }
 
 function spawnSpark(x, y, emoji) {
@@ -740,7 +1031,18 @@ function spawnConfetti(x, y) {
 
 function endGame(won) {
   state.gameOver = true;
+  state.locked = true;
   sfx.stopMusic();
+  // 清除所有 BOSS、投射物、IronPotato
+  (state.bosses || []).forEach(b => removeBoss(b));
+  state.bosses = [];
+  (state.projectiles || []).forEach(p => { if (p.parentNode) p.remove(); });
+  state.projectiles = [];
+  if (state.potato && state.potato._anim) {
+    clearInterval(state.potato._anim);
+    if (state.potato.parentNode) state.potato.remove();
+    state.potato = null;
+  }
   dom.endOverlay.classList.remove('hidden');
   if (won) {
     dom.endTitle.textContent = '🏆 完美通關！';
@@ -764,7 +1066,13 @@ function clampRobot() {
 
 // 遊戲迴圈
 function gameLoop() {
-  if (!state.locked && !state.gameOver && state.balloons.length > 0) {
+  // 投射物永遠更新（即使 locked，BOSS 攻擊期間玩家需閃躲）
+  if (!state.gameOver) {
+    updateProjectiles();
+  }
+
+  // 移動：鍵盤永遠可用（讓玩家在 BOSS 攻擊時可閃躲）；滑鼠目標移動需未鎖定
+  if (!state.gameOver && state.balloons.length > 0) {
     const prevX = state.robot.x, prevY = state.robot.y;
     let keyboardActive = false;
 
@@ -781,9 +1089,9 @@ function gameLoop() {
       keyboardActive = true;
     }
 
-    // 滑鼠目標移動
+    // 滑鼠目標移動（鎖定時停用）
     let targetActive = false;
-    if (state.target) {
+    if (state.target && !state.locked) {
       const tdx = state.target.x - state.robot.x;
       const tdy = state.target.y - state.robot.y;
       const dist = Math.hypot(tdx, tdy);
